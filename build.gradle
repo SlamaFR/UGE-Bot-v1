@@ -1,0 +1,41 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.0'
+    id 'java'
+    id 'application'
+}
+
+mainClassName = "fr.irwin.gr.UGEBot"
+
+group 'fr.irwin'
+version '2.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'net.dv8tion:JDA:4.2.0_204'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.slf4j:slf4j-simple:1.6.1'
+    compile 'com.google.guava:guava:28.0-jre'
+    compile 'org.json:json:20200518'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.8.3'
+    compile 'org.redisson:redisson:3.9.0'
+}
+
+shadowJar {
+    baseName = 'uge-bot'
+    classifier = null
+    version = null
+    configurations = [project.configurations.compile]
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.incremental = true
+}
