@@ -2,6 +2,7 @@ package fr.irwin.uge.managers;
 
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.internals.EventWaiter;
+import fr.irwin.uge.internals.TaskScheduler;
 import fr.irwin.uge.utils.EmotesUtils;
 import fr.irwin.uge.utils.RolesUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,6 +20,7 @@ import java.util.*;
 public class TicketManager extends ListenerAdapter {
 
     public static final int QUEUE_LIST_MAX_LINES = 5;
+    public static final int COOLDOWN = 180;
     public static final Map<Long, TicketManager> managers = new HashMap<>();
 
     private final JDA jda;
@@ -57,6 +59,9 @@ public class TicketManager extends ListenerAdapter {
         queue.offer(member.getIdLong());
         coolingDown.add(member.getIdLong());
         updateEmbed();
+
+        TaskScheduler.scheduleDelayed(() -> coolingDown.remove(member.getIdLong()), COOLDOWN * 1000);
+
         return true;
     }
 
