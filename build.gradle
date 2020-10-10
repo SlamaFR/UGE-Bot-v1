@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'net.dv8tion:JDA:4.2.0_204'
+    compile 'net.dv8tion:JDA:4.2.0_208'
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'org.slf4j:slf4j-simple:1.6.1'
     compile 'com.google.guava:guava:28.0-jre'
