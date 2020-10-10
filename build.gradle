@@ -4,7 +4,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = "fr.irwin.gr.UGEBot"
+mainClassName = "fr.irwin.uge.UGEBot"
 
 group 'fr.irwin'
 version '2.0'
@@ -24,7 +24,7 @@ dependencies {
     compile 'com.google.guava:guava:28.0-jre'
     compile 'org.json:json:20200518'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.8.3'
-    compile 'org.redisson:redisson:3.9.0'
+    compile 'org.redisson:redisson:3.13.5'
 }
 
 shadowJar {
