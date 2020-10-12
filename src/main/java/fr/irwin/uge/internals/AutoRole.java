@@ -107,7 +107,6 @@ public class AutoRole {
                         emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
                     }
                     if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember())) {
-                        m.delete().queue();
                         ew.close();
                         RedisUtils.removeAutoRole(e.getGuild(), m.getIdLong());
                         return;
