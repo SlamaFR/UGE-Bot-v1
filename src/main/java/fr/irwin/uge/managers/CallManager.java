@@ -109,7 +109,7 @@ public class CallManager {
             });
         } catch (IOException e) {
             textChannel.sendMessage("Une erreur est survenue lors de la fin de l'appel. Contacter votre administrateur.").queue();
-
+            e.printStackTrace();
         }
     }
 
@@ -126,6 +126,7 @@ public class CallManager {
 
         for (String name : presents) fw.write(" - " + name + "\n");
 
+        fw.flush();
         fw.close();
     }
 
