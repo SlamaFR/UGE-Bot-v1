@@ -18,7 +18,7 @@ public class RolesUtils {
 
     public static boolean isTeacher(Member member) {
         String teacherRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.teacherRole;
-        return member.getRoles().stream().anyMatch(r -> r.getId().equals(teacherRoleId));
+        return member.getRoles().stream().anyMatch(r -> r.getId().equals(teacherRoleId)) || isAdmin(member);
     }
 
     public static boolean isAdmin(Member member) {
