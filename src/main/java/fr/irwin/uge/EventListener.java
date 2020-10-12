@@ -43,7 +43,7 @@ public class EventListener extends ListenerAdapter {
         super.onReady(event);
 
         LOGGER.info("Restoring channel features...");
-        for (Guild guild : UGEBot.JDA().getGuilds()) {
+        for (Guild guild : event.getJDA().getGuilds()) {
             final Map<Long, AutoRole> autoRoles = RedisUtils.getObject(ChannelsFeatures.class, guild.getId()).getAutoRoles();
             for (Map.Entry<Long, AutoRole> entry : autoRoles.entrySet()) {
                 if (entry.getValue().restore(String.valueOf(entry.getKey()))) {
