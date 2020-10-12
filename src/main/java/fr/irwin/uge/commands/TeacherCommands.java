@@ -18,7 +18,7 @@ public class TeacherCommands {
         if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
         if (!RolesUtils.isTeacher(member)) return;
 
-        int time = 1;
+        int time = 5;
         if (args.length == 1) {
             try {
                 time = Integer.parseInt(args[0]);
