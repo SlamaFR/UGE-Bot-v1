@@ -8,6 +8,8 @@ import org.redisson.api.RBucket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class RedisUtils {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RedisUtils.class);
@@ -18,8 +20,8 @@ public class RedisUtils {
         T t = bucket.get();
         if (t == null) {
             try {
-                t = type.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                t = type.getDeclaredConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 LOGGER.error("[FATAL] Failed to initialize {} bucket!", type.getSimpleName());
             }
         }
