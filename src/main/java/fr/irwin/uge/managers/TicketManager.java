@@ -92,7 +92,7 @@ public class TicketManager extends ListenerAdapter {
         teacher.getGuild().moveVoiceMember(student, teacherVoiceState.getChannel()).queue();
     }
 
-    private void close() {
+    public void close() {
         final Guild guild = jda.getGuildById(guildId);
         if (guild == null) return;
 

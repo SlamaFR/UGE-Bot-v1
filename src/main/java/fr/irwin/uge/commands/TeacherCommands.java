@@ -60,5 +60,19 @@ public class TeacherCommands {
         TicketManager.getTicketManager(textChannel).takeNextTicket(member);
     }
 
+    @Command(name = "close")
+    private void close(Guild guild, TextChannel textChannel, Member member) {
+        if (guild == null) return;
+        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
+        if (!RolesUtils.isTeacher(member)) return;
+
+        if (!TicketManager.hasOpenTickedManager(textChannel)) {
+            MessageUtils.sendErrorMessage(textChannel, "Aucune file d'attente ouverte dans ce salon !");
+            return;
+        }
+
+        TicketManager.getTicketManager(textChannel).close();
+    }
+
 }
 
