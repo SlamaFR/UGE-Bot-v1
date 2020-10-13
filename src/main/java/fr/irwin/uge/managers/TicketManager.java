@@ -21,6 +21,7 @@ public class TicketManager extends ListenerAdapter {
 
     public static final int QUEUE_LIST_MAX_LINES = 5;
     public static final int COOLDOWN = 180;
+    public static final int QUEUE_TIMEOUT = 600;
     public static final Map<Long, TicketManager> managers = new HashMap<>();
 
     private final JDA jda;
@@ -31,6 +32,7 @@ public class TicketManager extends ListenerAdapter {
 
     private long ticketManagementMessageId = 0L;
     private long currentTicketMemberId = 0L;
+    private TaskScheduler timeoutTask;
 
     private TicketManager(TextChannel textChannel) {
         this.jda = textChannel.getJDA();
@@ -38,6 +40,7 @@ public class TicketManager extends ListenerAdapter {
         this.textChannelId = textChannel.getIdLong();
         this.queue = new LinkedList<>();
         this.coolingDown = new HashSet<>();
+        this.timeoutTask = getTimeoutTask();
         UGEBot.JDA().addEventListener(this);
         updateEmbed();
     }
@@ -61,7 +64,8 @@ public class TicketManager extends ListenerAdapter {
         updateEmbed();
 
         TaskScheduler.scheduleDelayed(() -> coolingDown.remove(member.getIdLong()), COOLDOWN * 1000);
-
+        this.timeoutTask.stop();
+        this.timeoutTask = getTimeoutTask();
         return true;
     }
 
@@ -82,6 +86,8 @@ public class TicketManager extends ListenerAdapter {
             return;
         }
         updateEmbed();
+        this.timeoutTask.stop();
+        this.timeoutTask = getTimeoutTask();
 
         final GuildVoiceState teacherVoiceState = teacher.getVoiceState();
         final GuildVoiceState studentVoiceState = student.getVoiceState();
@@ -213,6 +219,10 @@ public class TicketManager extends ListenerAdapter {
 
     private boolean isCoolingDown(Member member) {
         return coolingDown.contains(member.getIdLong());
+    }
+
+    private TaskScheduler getTimeoutTask() {
+        return TaskScheduler.scheduleDelayed(this::close, QUEUE_TIMEOUT * 1000);
     }
 
     @Override
