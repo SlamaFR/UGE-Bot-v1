@@ -23,4 +23,9 @@ public class StringUtils {
         }
         return String.valueOf(chars);
     }
+
+    public static String trim(String string) {
+        return Pattern.compile("[ \r\t\n]{3,}", Pattern.MULTILINE).matcher(string).replaceAll("\n\n");
+    }
+
 }
