@@ -2,6 +2,7 @@ package fr.irwin.uge.commands;
 
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
+import fr.irwin.uge.utils.ChannelUtils;
 import fr.irwin.uge.utils.StringUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -104,7 +105,7 @@ public class InternalCommands {
                 return;
             }
 
-            TextChannel textChannel = guild.getTextChannelById(UGEBot.config().guilds.get(guildId).channels.announcements);
+            TextChannel textChannel = ChannelUtils.getAnnouncementsChannel(guild);
             if (textChannel == null) {
                 LOGGER.error("Couldn't find announcements text channel on guild {}!", guildId);
                 continue;
