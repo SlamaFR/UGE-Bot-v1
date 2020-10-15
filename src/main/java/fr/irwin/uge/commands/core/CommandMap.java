@@ -1,13 +1,12 @@
 package fr.irwin.uge.commands.core;
 
 import fr.irwin.uge.UGEBot;
-import fr.irwin.uge.commands.InternalCommands;
 import fr.irwin.uge.commands.AdminCommands;
+import fr.irwin.uge.commands.InternalCommands;
 import fr.irwin.uge.commands.PublicCommands;
 import fr.irwin.uge.commands.TeacherCommands;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -99,26 +98,19 @@ public class CommandMap {
             else if (parameters[i].getType() == PrivateChannel.class)
                 objects[i] = message == null ? null : message.getPrivateChannel();
             else if (parameters[i].getType() == Guild.class)
-                objects[i] = message == null ? null : message.
-                        getGuild();
-            else if (parameters[i].getType() == String.class) objects[i] = command;
+                objects[i] = message == null ? null : message.getGuild();
+            else if (parameters[i].getType() == String.class)
+                objects[i] = command;
             else if (parameters[i].getType() == Message.class)
                 objects[i] = message;
             else if (parameters[i].getType() == JDA.class)
                 objects[i] = UGEBot.JDA();
-            else if (parameters[i].getType() == Member.class) {
-                assert message != null;
-                objects[i] = message.getMember();
-            } else if (parameters[i].getType() == MessageChannel.class) {
-                assert message != null;
-                objects[i] = message.getChannel();
-            }
+            else if (parameters[i].getType() == Member.class)
+                objects[i] = message == null ? null : message.getMember();
+            else if (parameters[i].getType() == MessageChannel.class)
+                objects[i] = message == null ? null : message.getChannel();
         }
-        try {
-            botCommand.getMethod().invoke(botCommand.getObject(), objects);
-        } catch (InsufficientPermissionException ignored) {
-        }
-
+        botCommand.getMethod().invoke(botCommand.getObject(), objects);
     }
 
 }
