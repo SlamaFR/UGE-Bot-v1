@@ -10,10 +10,7 @@ import net.dv8tion.jda.api.entities.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created on 15/03/2018.
@@ -50,8 +47,9 @@ public class CommandMap {
                 Command command = method.getAnnotation(Command.class);
                 method.setAccessible(true);
                 BotCommand botCommand;
-                botCommand = new BotCommand(command.name(), object, method);
+                botCommand = new BotCommand(command.name(), command.aliases(), object, method);
                 commands.put(command.name(), botCommand);
+                Arrays.stream(command.aliases()).forEach(alias -> commands.put(alias, botCommand));
                 if (!registry.contains(botCommand)) registry.add(botCommand);
             }
         }

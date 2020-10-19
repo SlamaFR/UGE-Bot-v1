@@ -8,11 +8,13 @@ import java.lang.reflect.Method;
 public final class BotCommand {
 
     private final String name;
+    private final String[] aliases;
     private final Object object;
     private final Method method;
 
-    BotCommand(String name, Object object, Method method) {
+    BotCommand(String name, String[] aliases, Object object, Method method) {
         this.name = name;
+        this.aliases = aliases;
         this.object = object;
         this.method = method;
     }
