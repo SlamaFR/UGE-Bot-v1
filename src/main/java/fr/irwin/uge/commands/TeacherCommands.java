@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class TeacherCommands {
 
-    @Command(name = "call")
+    @Command(name = "call", aliases = {"appel"})
     private void call(Guild guild, TextChannel textChannel, Member member, String[] args) {
         if (guild == null) return;
         if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
