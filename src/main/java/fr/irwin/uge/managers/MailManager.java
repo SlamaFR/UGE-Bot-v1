@@ -5,7 +5,6 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.internals.TaskScheduler;
 import fr.irwin.uge.utils.ChannelUtils;
 import fr.irwin.uge.utils.MailUtils;
-import fr.irwin.uge.utils.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

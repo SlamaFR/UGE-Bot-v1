@@ -47,7 +47,7 @@ public class CommandMap {
                 Command command = method.getAnnotation(Command.class);
                 method.setAccessible(true);
                 BotCommand botCommand;
-                botCommand = new BotCommand(command.name(), command.aliases(), object, method);
+                botCommand = new BotCommand(command.name(), object, method);
                 commands.put(command.name(), botCommand);
                 Arrays.stream(command.aliases()).forEach(alias -> commands.put(alias, botCommand));
                 if (!registry.contains(botCommand)) registry.add(botCommand);
