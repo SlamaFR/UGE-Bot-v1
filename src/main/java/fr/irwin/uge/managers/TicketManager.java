@@ -21,7 +21,7 @@ public class TicketManager extends ListenerAdapter {
 
     public static final int QUEUE_LIST_MAX_LINES = 5;
     public static final int COOLDOWN = 180;
-    public static final int QUEUE_TIMEOUT = 600;
+    public static final int QUEUE_TIMEOUT = 3600;
     public static final Map<Long, TicketManager> managers = new HashMap<>();
 
     private final JDA jda;
