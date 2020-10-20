@@ -8,7 +8,6 @@
         </encoder>
     </appender>
 
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>log/%d{dd-MM-yyyy}.log</fileNamePattern>
@@ -29,7 +28,6 @@
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
-
         </filter>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -37,7 +35,7 @@
         </filter>
 
         <encoder>
-            <pattern>%d{dd-MM-yy HH:mm:ss} - %msg%n</pattern>
+            <pattern>%d{dd-MM-yy HH:mm:ss} %-5level - %msg%n</pattern>
         </encoder>
     </appender>
 

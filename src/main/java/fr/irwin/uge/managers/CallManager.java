@@ -41,7 +41,7 @@ public class CallManager {
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy@HH-mm");
-        this.resultFile = new File(String.format("%s-#%s-%s.txt", member.getEffectiveName().replace(' ', '_'), textChannel.getName(), df.format(date)));
+        this.resultFile = new File(String.format("%s_#%s_%s.txt", member.getEffectiveName().replace(' ', '_'), textChannel.getName(), df.format(date)));
     }
 
     private long sendMessage(String teacherName) {
@@ -104,8 +104,9 @@ public class CallManager {
             fillFile(teacherName, textChannel.getName());
 
             member.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessage("Résultat de l'appel dans #" + textChannel.getName()).queue();
-                privateChannel.sendFile(resultFile).queue();
+                privateChannel.sendMessage("Résultat de l'appel dans #" + textChannel.getName())
+                        .addFile(resultFile)
+                        .queue();
             });
         } catch (IOException e) {
             textChannel.sendMessage("Une erreur est survenue lors de la fin de l'appel. Contacter votre administrateur.").queue();
