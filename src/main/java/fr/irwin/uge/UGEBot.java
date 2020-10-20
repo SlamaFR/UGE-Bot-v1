@@ -3,6 +3,7 @@ package fr.irwin.uge;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.irwin.uge.commands.core.CommandMap;
 import fr.irwin.uge.config.Config;
+import fr.irwin.uge.managers.MailManager;
 import fr.irwin.uge.redis.Redis;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.MessagingException;
 import javax.security.auth.login.LoginException;
 import java.util.*;
 
@@ -44,15 +46,33 @@ public class UGEBot implements Runnable {
     }
 
     public UGEBot() throws LoginException, JsonProcessingException {
+        JDA jda1;
         instance = this;
         commandMap = new CommandMap();
         config = Config.parseFile("./config.json");
+
         Redis.instance();
 
-        jda = JDABuilder.createDefault(config.token)
-                .addEventListeners(new EventListener(commandMap))
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                .build();
+        try {
+            jda1 = JDABuilder.createDefault(config.token)
+                    .addEventListeners(new EventListener(commandMap))
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                    .build().awaitReady();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
+            jda1 = null;
+        }
+
+        jda = jda1;
+
+        try {
+            LOGGER.info("Connecting to mail server...");
+            new MailManager();
+            LOGGER.info("Successfully connected to mail server!");
+        } catch (MessagingException e) {
+            LOGGER.error("Failed to start mail manager!", e);
+        }
 
         games = config.presenceMessages;
         generator = new Random();

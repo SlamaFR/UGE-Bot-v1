@@ -9,6 +9,7 @@ public class StringUtils {
     }
 
     public static String capitalizeString(String string) {
+        if (string == null) return null;
         char[] chars = string.toLowerCase().toCharArray();
         boolean found = false;
         for (int i = 0; i < chars.length; i++) {

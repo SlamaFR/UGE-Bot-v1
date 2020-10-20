@@ -54,6 +54,9 @@ public class Config {
             @JsonProperty
             public String announcements = "";
 
+            @JsonProperty
+            public Map<String, Long> elearning = new HashMap<>();
+
         }
 
         @JsonProperty
@@ -90,6 +93,28 @@ public class Config {
 
         @JsonProperty(required = true)
         public int port = 6379;
+
+        @JsonProperty(required = true)
+        public String password = "";
+
+    }
+
+    @JsonProperty(required = true)
+    public Mail mail = new Mail();
+
+    public static class Mail {
+
+        @JsonProperty(required = true)
+        public String host = "";
+
+        @JsonProperty(required = true)
+        public String protocol = "imap";
+
+        @JsonProperty(required = true)
+        public int port = 993;
+
+        @JsonProperty(required = true)
+        public String user = "";
 
         @JsonProperty(required = true)
         public String password = "";
