@@ -46,25 +46,21 @@ public class UGEBot implements Runnable {
     }
 
     public UGEBot() throws LoginException, JsonProcessingException {
-        JDA jda1;
         instance = this;
         commandMap = new CommandMap();
         config = Config.parseFile("./config.json");
 
         Redis.instance();
 
-        try {
-            jda1 = JDABuilder.createDefault(config.token)
+        jda = JDABuilder.createDefault(config.token)
                     .addEventListeners(new EventListener(commandMap))
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .build().awaitReady();
+                    .build();
+        try {
+            jda.awaitReady();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            System.exit(1);
-            jda1 = null;
         }
-
-        jda = jda1;
 
         try {
             LOGGER.info("Connecting to mail server...");
