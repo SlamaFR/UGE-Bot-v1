@@ -4,6 +4,7 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.config.Config;
 import fr.irwin.uge.internals.AutoRole;
+import fr.irwin.uge.internals.OrganizationDisplay;
 import fr.irwin.uge.managers.TrafficNotificationManager;
 import fr.irwin.uge.utils.EmotesUtils;
 import fr.irwin.uge.utils.MessageUtils;
@@ -47,10 +48,11 @@ public class AdminCommands {
         } else {
             autoRole.send();
         }
+        message.delete().queue();
     }
 
     @Command(name = "traffic")
-    private void traffic(Guild guild, TextChannel textChannel, Member member, String[] args) {
+    private void traffic(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
         if (guild == null) return;
         if (!RolesUtils.isAdmin(member)) return;
 
@@ -62,6 +64,40 @@ public class AdminCommands {
         if (args[0].equals("off")) {
             TrafficNotificationManager.unregisterTextChannel(guild, textChannel.getIdLong());
         }
+        message.delete().queue();
+    }
+
+    @Command(name = "display")
+    private void display(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
+        if (guild == null) return;
+        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
+        if (!RolesUtils.isAdmin(member)) return;
+
+        if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).organizationDisplays.containsKey(args[0])) {
+            MessageUtils.sendErrorMessage(textChannel, "Vous devez spécifier le nom d'un Display parmi la liste suivante :\n" +
+                    "```\n" + String.join(", ", UGEBot.config().guilds.get(guild.getId()).organizationDisplays.keySet()) + "\n```");
+            return;
+        }
+
+        Config.Guild.OrganizationDisplay config = UGEBot.config().guilds.get(guild.getId()).organizationDisplays.get(args[0]);
+        final OrganizationDisplay display = new OrganizationDisplay(guild.getIdLong(), textChannel.getIdLong(), config.title, config.fields);
+
+        if (args.length == 2) {
+            String messageId;
+            if (Pattern.matches("\\d{18}-\\d{18}", args[1])) {
+                messageId = args[1].split("-")[1];
+            } else {
+                messageId = args[1];
+            }
+            if (display.restore(messageId)) {
+                message.addReaction(EmotesUtils.YES.replace(">", "")).queue();
+            } else {
+                message.addReaction(EmotesUtils.NO.replace(">", "")).queue();
+            }
+        } else {
+            display.send();
+        }
+        message.delete().queue();
     }
 
 }

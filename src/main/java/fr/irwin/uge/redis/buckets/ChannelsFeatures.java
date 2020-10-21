@@ -2,6 +2,7 @@ package fr.irwin.uge.redis.buckets;
 
 import com.google.gson.Gson;
 import fr.irwin.uge.internals.AutoRole;
+import fr.irwin.uge.internals.OrganizationDisplay;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Set;
 public class ChannelsFeatures {
 
     private final Map<Long, AutoRole> autoRoles = new HashMap<>();
+    private final Map<Long, OrganizationDisplay> displays = new HashMap<>();
     private final Set<Long> trafficNotificationChannels = new HashSet<>();
 
     @Override
@@ -24,5 +26,9 @@ public class ChannelsFeatures {
 
     public Set<Long> getTrafficNotificationChannels() {
         return trafficNotificationChannels;
+    }
+
+    public Map<Long, OrganizationDisplay> getDisplays() {
+        return displays;
     }
 }

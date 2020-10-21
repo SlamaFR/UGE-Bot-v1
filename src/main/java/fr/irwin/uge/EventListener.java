@@ -2,6 +2,7 @@ package fr.irwin.uge;
 
 import fr.irwin.uge.commands.core.CommandMap;
 import fr.irwin.uge.internals.AutoRole;
+import fr.irwin.uge.internals.OrganizationDisplay;
 import fr.irwin.uge.managers.TrafficNotificationManager;
 import fr.irwin.uge.redis.buckets.ChannelsFeatures;
 import fr.irwin.uge.utils.RedisUtils;
@@ -57,6 +58,15 @@ public class EventListener extends ListenerAdapter {
             for (Long channelId : trafficNotificationChannels) {
                 TrafficNotificationManager.registerTextChannel(guild, channelId);
                 LOGGER.info("Restored TrafficNotifier on {}!", channelId);
+            }
+
+            final Map<Long, OrganizationDisplay> displays = RedisUtils.getObject(ChannelsFeatures.class, guild.getId()).getDisplays();
+            for (Map.Entry<Long, OrganizationDisplay> entry : displays.entrySet()) {
+                if (entry.getValue().restore(String.valueOf(entry.getKey()))) {
+                    LOGGER.info("Restored OrganizationDisplay on {}!", entry.getKey());
+                } else {
+                    LOGGER.warn("Failed to restore OrganizationDisplay on {}!", entry.getKey());
+                }
             }
         }
 

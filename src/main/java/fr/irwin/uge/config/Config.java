@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.irwin.uge.internals.OrganizationDisplay.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,9 @@ public class Config {
 
             @JsonProperty(required = true)
             public String adminRole = "";
+
+            @JsonProperty(required = true)
+            public String managerRole = "";
 
             @JsonProperty(required = true)
             public String teacherRole = "";
@@ -78,6 +82,19 @@ public class Config {
 
             @JsonProperty(required = true)
             public Map<String, String> roles;
+
+        }
+
+        @JsonProperty
+        public Map<String, OrganizationDisplay> organizationDisplays = new HashMap<>();
+
+        public static class OrganizationDisplay {
+
+            @JsonProperty
+            public String title= "";
+
+            @JsonProperty
+            public Map<String, Field> fields = new HashMap<>();
 
         }
 
