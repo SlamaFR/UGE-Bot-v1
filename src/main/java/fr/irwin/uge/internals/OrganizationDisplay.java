@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 public class OrganizationDisplay {
@@ -121,6 +122,9 @@ public class OrganizationDisplay {
         final Message message = textChannel.retrieveMessageById(messageId).complete();
         if (message == null) return;
         message.editMessage(messageEmbed).queue();
+
+        /* Updating Redis */
+        RedisUtils.addDisplay(guild, messageId, this);
     }
 
     private MessageEmbed getEmbed() {
@@ -138,10 +142,10 @@ public class OrganizationDisplay {
     }
 
     private void setDates() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_WEEK, 0);
+        Calendar calendar = Calendar.getInstance(Locale.FRANCE);
+        calendar.set(Calendar.DAY_OF_WEEK, 2);
         this.start = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_WEEK, 7);
+        calendar.set(Calendar.DAY_OF_WEEK, 1);
         this.end = calendar.getTime();
     }
 
