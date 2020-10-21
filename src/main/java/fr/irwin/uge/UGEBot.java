@@ -40,7 +40,7 @@ public class UGEBot implements Runnable {
             LOGGER.error("Provided token is incorrect!");
             System.exit(1);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Error occurred whilst parsing config.json!");
+            LOGGER.error("Error occurred whilst parsing config.json!", e);
             System.exit(1);
         }
     }
