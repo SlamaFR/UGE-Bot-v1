@@ -1,9 +1,11 @@
-package fr.irwin.uge.internals;
+package fr.irwin.uge.features.message;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.irwin.uge.UGEBot;
+import fr.irwin.uge.features.MessageFeature;
 import fr.irwin.uge.config.Config;
+import fr.irwin.uge.internals.EventWaiter;
 import fr.irwin.uge.utils.RedisUtils;
 import fr.irwin.uge.utils.RolesUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,10 +17,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-public class AutoRole {
+public class AutoRole extends MessageFeature {
 
-    private final long guildId;
-    private final long textChannelId;
     private final String title;
     private final String description;
     private final Map<String, String> roles;
@@ -27,8 +27,7 @@ public class AutoRole {
     private final int maxRoles;
 
     public AutoRole(@NotNull TextChannel textChannel, String title, String description, Map<String, String> roles, boolean rolesList, int maxRoles) {
-        this.guildId = textChannel.getGuild().getIdLong();
-        this.textChannelId = textChannel.getIdLong();
+        super(textChannel.getGuild().getIdLong(), textChannel.getIdLong());
         this.title = title;
         this.description = description;
         this.roles = roles;
@@ -49,8 +48,7 @@ public class AutoRole {
                     @JsonProperty("title") String title, @JsonProperty("description") String description,
                     @JsonProperty("roles") Map<String, String> roles, @JsonProperty("rolesList") boolean rolesList,
                     @JsonProperty("maxRoles") int maxRoles) {
-        this.guildId = guildId;
-        this.textChannelId = textChannelId;
+        super(guildId, textChannelId);
         this.title = title;
         this.description = description;
         this.roles = roles;
@@ -61,6 +59,7 @@ public class AutoRole {
         fillRolesCollection();
     }
 
+    @Override
     public void send() {
         final MessageEmbed messageEmbed = getMessageEmbed();
         if (messageEmbed == null) return;
@@ -73,27 +72,11 @@ public class AutoRole {
 
         final Message message = textChannel.sendMessage(messageEmbed).complete();
         start(message);
-        RedisUtils.addAutoRole(textChannel.getGuild(), message.getIdLong(), this);
+        RedisUtils.addFeature(textChannel.getGuild(), message.getIdLong(), this);
     }
 
-    public boolean restore(String messageId) {
-        final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return false;
-
-        final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return false;
-
-        try {
-            final Message message = textChannel.retrieveMessageById(messageId).complete();
-            this.start(message);
-            RedisUtils.addAutoRole(textChannel.getGuild(), message.getIdLong(), this);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void start(Message m) {
+    @Override
+    protected void start(Message m) {
         roles.keySet().stream().sorted().map(e -> e.replace(">", "")).forEach(e -> m.addReaction(e).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
                 e -> e.getMessageIdLong() == m.getIdLong() && !e.getUser().isBot() &&
@@ -107,7 +90,7 @@ public class AutoRole {
                     }
                     if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember())) {
                         ew.close();
-                        RedisUtils.removeAutoRole(e.getGuild(), m.getIdLong());
+                        RedisUtils.removeFeature(e.getGuild(), m.getIdLong(), this);
                         return;
                     }
                     Role role = m.getGuild().getRoleById(roles.get(emote));

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.irwin.uge.internals.OrganizationDisplay.Field;
+import fr.irwin.uge.features.message.OrganizationDisplay.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

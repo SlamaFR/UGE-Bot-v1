@@ -1,10 +1,10 @@
 package fr.irwin.uge;
 
 import fr.irwin.uge.commands.core.CommandMap;
-import fr.irwin.uge.internals.AutoRole;
-import fr.irwin.uge.internals.OrganizationDisplay;
-import fr.irwin.uge.managers.TrafficNotificationManager;
-import fr.irwin.uge.redis.buckets.ChannelsFeatures;
+import fr.irwin.uge.features.message.AutoRole;
+import fr.irwin.uge.features.message.OrganizationDisplay;
+import fr.irwin.uge.features.channel.TrafficNotifier;
+import fr.irwin.uge.redis.Redis;
 import fr.irwin.uge.utils.RedisUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -15,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created on 04/10/2018.
@@ -45,29 +43,19 @@ public class EventListener extends ListenerAdapter {
 
         LOGGER.info("Restoring channel features...");
         for (Guild guild : event.getJDA().getGuilds()) {
-            final Map<Long, AutoRole> autoRoles = RedisUtils.getObject(ChannelsFeatures.class, guild.getId()).getAutoRoles();
-            for (Map.Entry<Long, AutoRole> entry : autoRoles.entrySet()) {
-                if (entry.getValue().restore(String.valueOf(entry.getKey()))) {
-                    LOGGER.info("Restored AutoRole on {}!", entry.getKey());
-                } else {
-                    LOGGER.warn("Failed to restore AutoRole on {}!", entry.getKey());
-                }
-            }
+            Redis.instance().getMap(RedisUtils.getKey(guild, AutoRole.class)).forEach((msgId, o) -> {
+                ((AutoRole) o).restore(String.valueOf(msgId), null);
+            });
 
-            final Set<Long> trafficNotificationChannels = RedisUtils.getObject(ChannelsFeatures.class, guild.getId()).getTrafficNotificationChannels();
-            for (Long channelId : trafficNotificationChannels) {
-                TrafficNotificationManager.registerTextChannel(guild, channelId);
-                LOGGER.info("Restored TrafficNotifier on {}!", channelId);
-            }
+            Redis.instance().getMap(RedisUtils.getKey(guild, OrganizationDisplay.class)).forEach((msgId, o) -> {
+                ((OrganizationDisplay) o).restore(String.valueOf(msgId), null);
+            });
+        }
 
-            final Map<Long, OrganizationDisplay> displays = RedisUtils.getObject(ChannelsFeatures.class, guild.getId()).getDisplays();
-            for (Map.Entry<Long, OrganizationDisplay> entry : displays.entrySet()) {
-                if (entry.getValue().restore(String.valueOf(entry.getKey()))) {
-                    LOGGER.info("Restored OrganizationDisplay on {}!", entry.getKey());
-                } else {
-                    LOGGER.warn("Failed to restore OrganizationDisplay on {}!", entry.getKey());
-                }
-            }
+        TrafficNotifier manager = RedisUtils.getObject(TrafficNotifier.class);
+        if (manager != null) {
+            TrafficNotifier.instance(manager);
+            LOGGER.info("Restored TrafficNotifier!");
         }
 
         LOGGER.info("Ready!");

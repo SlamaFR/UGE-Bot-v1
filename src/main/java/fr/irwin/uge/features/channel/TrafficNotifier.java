@@ -1,4 +1,4 @@
-package fr.irwin.uge.managers;
+package fr.irwin.uge.features.channel;
 
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.internals.JSONFetcher;
@@ -6,7 +6,6 @@ import fr.irwin.uge.internals.TaskScheduler;
 import fr.irwin.uge.utils.EmotesUtils;
 import fr.irwin.uge.utils.RedisUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.json.JSONObject;
 
@@ -19,16 +18,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TrafficNotificationManager {
+public class TrafficNotifier {
 
-    private static final TrafficNotificationManager manager = new TrafficNotificationManager();
+    private static TrafficNotifier manager;
 
     private final Set<Long> textChannelsIds;
     private final Map<String, List<String>> lastMessages;
     private final Map<String, String> veryLastMessage;
     private final Map<String, String[]> linesMeta;
 
-    private TrafficNotificationManager() {
+    private TrafficNotifier() {
         this.lastMessages = new HashMap<>();
         this.textChannelsIds = new HashSet<>();
         this.veryLastMessage = new HashMap<>();
@@ -41,14 +40,23 @@ public class TrafficNotificationManager {
         TaskScheduler.scheduleRepeating(lastMessages::clear, 7200000);
     }
 
-    public static void registerTextChannel(Guild guild, long textChannelId) {
-        manager.textChannelsIds.add(textChannelId);
-        RedisUtils.addTrafficChannel(guild, textChannelId);
+    public static TrafficNotifier instance() {
+        if (manager == null) manager = new TrafficNotifier();
+        return manager;
     }
 
-    public static void unregisterTextChannel(Guild guild, long textChannelId) {
+    public static void instance(TrafficNotifier m) {
+        manager = m;
+    }
+
+    public void registerTextChannel(long textChannelId) {
+        manager.textChannelsIds.add(textChannelId);
+        RedisUtils.setObject(this);
+    }
+
+    public void unregisterTextChannel(long textChannelId) {
         manager.textChannelsIds.remove(textChannelId);
-        RedisUtils.removeTrafficChannel(guild, textChannelId);
+        RedisUtils.setObject(this);
     }
 
     private void refreshData() {

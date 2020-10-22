@@ -1,8 +1,10 @@
-package fr.irwin.uge.internals;
+package fr.irwin.uge.features.message;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.irwin.uge.UGEBot;
+import fr.irwin.uge.features.MessageFeature;
+import fr.irwin.uge.internals.EventWaiter;
 import fr.irwin.uge.utils.DateUtils;
 import fr.irwin.uge.utils.RedisUtils;
 import fr.irwin.uge.utils.RolesUtils;
@@ -18,10 +20,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class OrganizationDisplay {
+public class OrganizationDisplay extends MessageFeature {
 
-    private final long guildId;
-    private final long textChannelId;
     private final String title;
     private final Map<String, Field> fields;
 
@@ -30,8 +30,7 @@ public class OrganizationDisplay {
     private Date end;
 
     public OrganizationDisplay(long guildId, long textChannelId, String title, Map<String, Field> fields) {
-        this.guildId = guildId;
-        this.textChannelId = textChannelId;
+        super(guildId, textChannelId);
         this.title = title;
         this.fields = fields;
         setDates();
@@ -43,8 +42,7 @@ public class OrganizationDisplay {
                                @JsonProperty("title") String title, @JsonProperty("fields") Map<String, Field> fields,
                                @JsonProperty("messageId") long messageId, @JsonProperty("start") Date start,
                                @JsonProperty("end") Date end) {
-        this.guildId = guildId;
-        this.textChannelId = textChannelId;
+        super(guildId, textChannelId);
         this.title = title;
         this.fields = fields;
         this.messageId = messageId;
@@ -52,7 +50,24 @@ public class OrganizationDisplay {
         this.end = end;
     }
 
-    public void start(Message m) {
+    @Override
+    public void send() {
+        final MessageEmbed messageEmbed = getEmbed();
+
+        final Guild guild = UGEBot.JDA().getGuildById(guildId);
+        if (guild == null) return;
+
+        final TextChannel textChannel = guild.getTextChannelById(textChannelId);
+        if (textChannel == null) return;
+
+        Message message = textChannel.sendMessage(messageEmbed).complete();
+        messageId = message.getIdLong();
+        start(message);
+        RedisUtils.addFeature(guild, messageId, this);
+    }
+
+    @Override
+    protected void start(Message m) {
         fields.keySet().forEach(emote -> m.addReaction(emote.replace(">", "")).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
                 e -> e.getMessageIdLong() == messageId && RolesUtils.isTeacher(e.getMember()),
@@ -70,43 +85,11 @@ public class OrganizationDisplay {
                         e.getReaction().removeReaction(e.getUser()).queue();
                     } else if (emote.equals("❌")) {
                         ew.close();
-                        RedisUtils.removeDisplay(e.getGuild(), messageId);
+                        RedisUtils.removeFeature(e.getGuild(), messageId, this);
                     }
                 })
                 .autoClose(false)
                 .build();
-    }
-
-    public boolean restore(String messageId) {
-        final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return false;
-
-        final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return false;
-
-        try {
-            final Message message = textChannel.retrieveMessageById(messageId).complete();
-            this.start(message);
-            RedisUtils.addDisplay(textChannel.getGuild(), message.getIdLong(), this);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void send() {
-        final MessageEmbed messageEmbed = getEmbed();
-
-        final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return;
-
-        final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
-
-        Message message = textChannel.sendMessage(messageEmbed).complete();
-        messageId = message.getIdLong();
-        start(message);
-        RedisUtils.addDisplay(guild, messageId, this);
     }
 
     private void update() {
@@ -124,10 +107,11 @@ public class OrganizationDisplay {
         message.editMessage(messageEmbed).queue();
 
         /* Updating Redis */
-        RedisUtils.addDisplay(guild, messageId, this);
+        RedisUtils.addFeature(guild, messageId, this);
     }
 
     private MessageEmbed getEmbed() {
+
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(title)
                 .setDescription(String.format("Semaine du **%s** au **%s**",
