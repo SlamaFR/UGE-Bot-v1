@@ -184,27 +184,18 @@ public class TicketManager extends ListenerAdapter {
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> {
             return e.getMessageIdLong() == message.getIdLong() && !e.getUser().isBot();
         }, (e, ew) -> {
-            String emote;
-            try {
-                emote = e.getReactionEmote().getEmoji();
-            } catch (IllegalStateException ex) {
-                emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
-            }
-            switch (emote) {
+            switch (EmotesUtils.getEmote(e.getReactionEmote())) {
                 case "🙋":
-                    e.getReaction().removeReaction(e.getUser()).queue();
                     openTicket(e.getMember());
+                    e.getReaction().removeReaction(e.getUser()).queue();
                     break;
                 case "⏭":
-                    e.getReaction().removeReaction(e.getUser()).queue();
                     if (!RolesUtils.isTeacher(e.getMember())) return;
+                    e.getReaction().removeReaction(e.getUser()).queue();
                     takeNextTicket(e.getMember());
                     break;
                 case EmotesUtils.NO:
-                    if (!RolesUtils.isTeacher(e.getMember())) {
-                        e.getReaction().removeReaction(e.getUser()).queue();
-                        return;
-                    }
+                    if (!RolesUtils.isTeacher(e.getMember())) return;
                     close();
                     break;
             }

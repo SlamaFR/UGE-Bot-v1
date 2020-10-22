@@ -2,6 +2,7 @@ package fr.irwin.uge.managers;
 
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.internals.EventWaiter;
+import fr.irwin.uge.utils.EmotesUtils;
 import fr.irwin.uge.utils.RolesUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -64,7 +65,7 @@ public class CallManager {
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> {
             boolean messageCheck = e.getMessageIdLong() == message.getIdLong();
             boolean roleCheck = RolesUtils.isStudent(e.getMember());
-            boolean emoteCheck = e.getReactionEmote().getEmoji().equals(CALL_PRESENT_EMOTE);
+            boolean emoteCheck = EmotesUtils.getEmote(e.getReactionEmote()).equals(CALL_PRESENT_EMOTE);
             boolean userCheck = !e.getUser().isBot();
             return messageCheck && roleCheck && emoteCheck && userCheck;
         }, (e, ew) -> presents.add(e.getMember().getEffectiveName()))
