@@ -69,7 +69,7 @@ public class MailUtils {
     public static String getCourseName(Message message) throws MessagingException {
         String header = String.join(" ", message.getHeader("X-Course-Name"))
                 .replaceAll("[\"\t\r\n]", "");
-        return (header.isEmpty()) ? null : header;
+        return (header.isEmpty()) ? null : decodeRFC_2047(header);
     }
 
     public static String getCourseId(Message message) throws MessagingException {

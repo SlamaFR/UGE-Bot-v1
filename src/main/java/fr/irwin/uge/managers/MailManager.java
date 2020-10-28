@@ -25,7 +25,7 @@ public class MailManager {
     public static final String SEPARATOR = "---------------------------------------------------------------------";
     private static final Logger LOGGER = LoggerFactory.getLogger(MailManager.class);
 
-    private final Folder inbox;
+    private Folder inbox;
 
     public MailManager() throws MessagingException {
         this.inbox = getStore().getFolder("INBOX");
@@ -36,6 +36,7 @@ public class MailManager {
                 super.disconnected(e);
                 try {
                     LOGGER.info("Keeping mail server connection alive");
+                    inbox = getStore().getFolder("INBOX");
                     inbox.open(Folder.READ_ONLY);
                 } catch (MessagingException ex) {
                     LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
@@ -71,6 +72,12 @@ public class MailManager {
                     } catch (MessagingException ex) {
                         LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                     }
+                } catch (StoreClosedException e) {
+                    try {
+                        inbox = getStore().getFolder("INBOX");
+                    } catch (MessagingException ex) {
+                        LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
+                    }
                 } catch (MessagingException | IOException e) {
                     LOGGER.warn("[MAIL][Unstable] Mail failed to parse/read!", e);
                 } catch (Exception e) {
@@ -96,6 +103,7 @@ public class MailManager {
         Color color = null;
         String avatarUrl = null;
         for (Guild guild : UGEBot.JDA().getGuilds()) {
+            System.out.println("Checking " + guild);
             textChannel = ChannelUtils.getCourseChannel(guild, courseId);
             if (textChannel != null) {
                 if (!senderName.isEmpty()) {
