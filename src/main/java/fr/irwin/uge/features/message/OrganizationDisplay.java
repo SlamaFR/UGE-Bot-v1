@@ -61,13 +61,13 @@ public class OrganizationDisplay extends MessageFeature {
         if (textChannel == null) return;
 
         Message message = textChannel.sendMessage(messageEmbed).complete();
-        messageId = message.getIdLong();
         start(message);
         RedisUtils.addFeature(guild, messageId, this);
     }
 
     @Override
     protected void start(Message m) {
+        messageId = m.getIdLong();
         fields.keySet().forEach(emote -> m.addReaction(emote.replace(">", "")).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
                 e -> e.getMessageIdLong() == messageId && RolesUtils.isTeacher(e.getMember()),

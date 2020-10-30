@@ -31,6 +31,8 @@ public abstract class MessageFeature {
         if (textChannel == null) return;
 
         textChannel.retrieveMessageById(messageId).queue(message -> {
+            if (!message.getAuthor().equals(UGEBot.JDA().getSelfUser())) return;
+
             start(message);
             RedisUtils.addFeature(textChannel.getGuild(), message.getIdLong(), this);
             logger.info("Restored {} on {}!", getClass().getSimpleName(), messageId);

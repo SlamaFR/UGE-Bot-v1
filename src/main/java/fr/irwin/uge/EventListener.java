@@ -41,7 +41,6 @@ public class EventListener extends ListenerAdapter {
     public void onReady(@Nonnull ReadyEvent event) {
         super.onReady(event);
 
-        LOGGER.info("Restoring channel features...");
         for (Guild guild : event.getJDA().getGuilds()) {
             Redis.instance().getMap(RedisUtils.getKey(guild, AutoRole.class)).forEach((msgId, o) -> {
                 ((AutoRole) o).restore(String.valueOf(msgId), null);

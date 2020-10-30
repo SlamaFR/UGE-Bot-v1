@@ -81,7 +81,7 @@ public class AdminCommands {
             } else {
                 messageId = args[1];
             }
-            feature.restore(messageId, () -> message.addReaction(EmotesUtils.YES.replace(">", "")).queue());
+            feature.restore(messageId, null);
         } else {
             feature.send();
         }
