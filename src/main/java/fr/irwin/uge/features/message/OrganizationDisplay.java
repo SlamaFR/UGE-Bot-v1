@@ -86,6 +86,9 @@ public class OrganizationDisplay extends MessageFeature {
                     } else if (emote.equals("❌")) {
                         ew.close();
                         RedisUtils.removeFeature(e.getGuild(), messageId, this);
+                    } else if (emote.equals("🔄")) {
+                        update();
+                        e.getReaction().removeReaction(e.getUser()).queue();
                     }
                 })
                 .autoClose(false)
