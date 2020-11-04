@@ -23,9 +23,9 @@ public class MailUtils {
             try {
                 return MimeUtility.decodeWord(s);
             } catch (ParseException | UnsupportedEncodingException e) {
-                return string;
+                return s + ' ';
             }
-        }).collect(Collectors.joining());
+        }).collect(Collectors.joining()).trim();
     }
 
     public static String extractContent(Message message) throws IOException, MessagingException {
@@ -67,9 +67,11 @@ public class MailUtils {
     }
 
     public static String getCourseName(Message message) throws MessagingException {
-        String header = String.join(" ", message.getHeader("X-Course-Name"))
-                .replaceAll("[\"\t\r\n]", "");
-        return (header.isEmpty()) ? null : decodeRFC_2047(header);
+        String h = decodeRFC_2047(String.join(" ", message.getHeader("Subject")));
+        String[] split = h.split(":");
+        h = String.join(":", Arrays.copyOfRange(split, 1, split.length));
+        h = h.replaceAll("[\"\t\r\n]", "");
+        return (h.isEmpty()) ? null : h.trim();
     }
 
     public static String getCourseId(Message message) throws MessagingException {
