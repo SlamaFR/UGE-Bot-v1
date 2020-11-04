@@ -1,18 +1,26 @@
 package fr.irwin.uge.commands;
 
+import com.inamik.text.tables.GridTable;
+import com.inamik.text.tables.SimpleTable;
+import com.inamik.text.tables.grid.Border;
+import com.inamik.text.tables.grid.Util;
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.managers.TicketManager;
 import fr.irwin.uge.utils.EmotesUtils;
 import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.StringUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class PublicCommands {
@@ -36,63 +44,53 @@ public class PublicCommands {
 
     @Command(name = "table", aliases = {"tab"})
     private void table(TextChannel textChannel, Message message) {
-        List<List<String>> table = new ArrayList<>();
-        List<Integer> sizes = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-
         List<String> args = StringUtils.splitArgs(message.getContentRaw());
         args.remove(0);
 
-        for (String arg : args) {
-            String[] split = arg.split(";");
-            String s;
-            for (int i = 0; i < split.length; i++) {
-                s = split[i];
-                if (table.size() <= i) {
-                    table.add(new ArrayList<>());
-                }
-                if (sizes.size() <= i) {
-                    sizes.add(s.length());
-                } else if (sizes.get(i) < s.length()) {
-                    sizes.set(i, s.length());
-                }
-                table.get(i).add(s);
-            }
-            for (int i = split.length; i < table.size(); i++) {
-                table.get(i).add("");
+        if (args.isEmpty()) {
+            textChannel.sendMessage(
+                    new EmbedBuilder()
+                            .setTitle("Générateur de tableaux ASCII")
+                            .setDescription("Cette commande permet de générer rapidement des tableaux avec des caractères ASCII.")
+                            .addField("Utilisation", "`!table <Ligne 1> <Ligne 2> ... <Ligne N>`", false)
+                            .addField("Syntaxe", "Une ligne est divisée en colonnes par le caractère `;`. " +
+                                    "Si votre ligne contient un ou plusieurs espace, il faut l'encadrer avec des " +
+                                    "guillemets pour éviter des comportements innatendus.", false)
+                            .addField("Exemple", "`!table \";Colonne 1;Colonne 2\" \"Ligne 1;Val 1;Val 2\" ou;comme;ceci`\n" +
+                                    "```\n" +
+                                    "+---------+-----------+-----------+\n" +
+                                    "|         | Colonne 1 | Colonne 2 |\n" +
+                                    "+---------+-----------+-----------+\n" +
+                                    "| Ligne 1 | Val 1     | Val 2     |\n" +
+                                    "+---------+-----------+-----------+\n" +
+                                    "| ou      | comme     | ceci      |\n" +
+                                    "+---------+-----------+-----------+\n" +
+                                    "```", false)
+                            .build()
+            ).queue();
+            return;
+        }
+
+        SimpleTable s = SimpleTable.of();
+        for (String row : args) {
+            s.nextRow();
+            for (String col : row.split(";", -1)) {
+                s.nextCell().addLine(" " + col + " ");
             }
         }
 
-        builder.append("```\n");
-        writeTab(builder, args.size(), table, sizes);
-        builder.append("```");
+        GridTable g = s.toGrid();
+        g = Border.of(Border.Chars.of('+', '-', '|')).apply(g);
 
-        textChannel.sendMessage(builder.toString()).queue();
-    }
-
-    private void writeTab(StringBuilder builder, int lines, List<List<String>> table, List<Integer> sizes) {
-        for (int i = 0; i < lines; i++) {
-            writeHorizontalLine(builder, table.size(), sizes);
-            for (int j = 0; j < table.size(); j++) {
-                builder.append('|');
-                builder.append(' ').append(table.get(j).get(i)).append(' ');
-                for (int k = table.get(j).get(i).length(); k < sizes.get(j); k++) {
-                    builder.append(' ');
-                }
-            }
-            builder.append("|\n");
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final String utf8 = StandardCharsets.UTF_8.name();
+        try (PrintStream ps = new PrintStream(baos, true, utf8)) {
+            Util.print(g, ps);
+            textChannel.sendMessage("```\n" + baos.toString(utf8) + "```").queue();
+            ps.close();
+            baos.close();
+        } catch (IOException e) {
+            MessageUtils.sendErrorMessage(textChannel, "Une erreur d'encodage est survenue !");
         }
-        writeHorizontalLine(builder, table.size(), sizes);
     }
-
-    private void writeHorizontalLine(StringBuilder builder, int tableSize, List<Integer> sizes) {
-        for (int j = 0; j < tableSize; j++) {
-            builder.append('+');
-            for (int k = 0; k < sizes.get(j) + 2; k++) {
-                builder.append('-');
-            }
-        }
-        builder.append("+\n");
-    }
-
 }

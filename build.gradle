@@ -7,13 +7,16 @@ plugins {
 mainClassName = "fr.irwin.uge.UGEBot"
 
 group 'fr.irwin'
-version '2.3.4'
+version '2.3.5'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 dependencies {
@@ -27,6 +30,7 @@ dependencies {
     compile 'org.json:json:20200518'
     compile 'org.redisson:redisson:3.13.5'
     compile 'org.simplejavamail:simple-java-mail:4.1.1'
+    compile 'com.github.inamik.text.tables:inamik-text-tables:1.0-SNAPSHOT'
 }
 
 shadowJar {
