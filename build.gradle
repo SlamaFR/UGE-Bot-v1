@@ -7,16 +7,13 @@ plugins {
 mainClassName = "fr.irwin.uge.UGEBot"
 
 group 'fr.irwin'
-version '2.3.7'
+version '2.3.8'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
 }
 
 dependencies {
