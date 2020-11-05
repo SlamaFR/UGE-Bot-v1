@@ -17,23 +17,26 @@ import java.util.*;
  *
  * @version 2.0
  */
-public class CommandMap {
-
+public class CommandMap
+{
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final List<BotCommand> registry = new ArrayList<>();
 
-    public CommandMap() {
+    public CommandMap()
+    {
         registerCommand(new InternalCommands());
         registerCommand(new AdminCommands());
         registerCommand(new TeacherCommands());
         registerCommand(new PublicCommands());
     }
 
-    public static String getTag() {
+    public static String getTag()
+    {
         return "!";
     }
 
-    private Object[] getCommand(String command) {
+    private Object[] getCommand(String command)
+    {
         String[] commandSplit = command.split(" ");
         String[] args = new String[commandSplit.length - 1];
         System.arraycopy(commandSplit, 1, args, 0, commandSplit.length - 1);
@@ -41,9 +44,12 @@ public class CommandMap {
         return new Object[]{botCommand, args};
     }
 
-    private void registerCommand(Object object) {
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Command.class)) {
+    private void registerCommand(Object object)
+    {
+        for (Method method : object.getClass().getDeclaredMethods())
+        {
+            if (method.isAnnotationPresent(Command.class))
+            {
                 Command command = method.getAnnotation(Command.class);
                 method.setAccessible(true);
                 BotCommand botCommand;
@@ -55,36 +61,45 @@ public class CommandMap {
         }
     }
 
-    public void commandConsole(String command) {
+    public void commandConsole(String command)
+    {
         Object[] object = getCommand(command);
-        if (object[0] == null) {
+        if (object[0] == null)
+        {
             System.out.println("Unknown command.");
             return;
         }
         BotCommand cmd = (BotCommand) object[0];
-        try {
+        try
+        {
             execute(cmd, command, (String[]) object[1], null);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
 
-    public void commandUser(String command, Message message) {
+    public void commandUser(String command, Message message)
+    {
         Object[] object = getCommand(command);
         if (object[0] == null) return;
         BotCommand cmd = (BotCommand) object[0];
-        try {
+        try
+        {
             execute(cmd, command, (String[]) object[1], message);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             System.out.printf("The %s command failed\n", cmd.getName());
             e.printStackTrace();
         }
     }
 
-    private void execute(BotCommand botCommand, String command, String[] args, Message message) throws Exception {
+    private void execute(BotCommand botCommand, String command, String[] args, Message message) throws Exception
+    {
         Parameter[] parameters = botCommand.getMethod().getParameters();
         Object[] objects = new Object[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
+        for (int i = 0; i < parameters.length; i++)
+        {
             if (parameters[i].getType() == String[].class)
                 objects[i] = args;
             else if (parameters[i].getType() == User.class)
@@ -110,5 +125,4 @@ public class CommandMap {
         }
         botCommand.getMethod().invoke(botCommand.getObject(), objects);
     }
-
 }

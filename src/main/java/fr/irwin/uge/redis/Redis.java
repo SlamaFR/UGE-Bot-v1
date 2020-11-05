@@ -8,13 +8,14 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Redis {
-
+public class Redis
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(Redis.class);
     private static Redis instance;
     private final RedissonClient redissonClient;
 
-    private Redis() {
+    private Redis()
+    {
         final String host = UGEBot.config().redis.host;
         final int port = UGEBot.config().redis.port;
         final String password = UGEBot.config().redis.password;
@@ -22,17 +23,20 @@ public class Redis {
         this.redissonClient = initRedisson(host, port, password);
     }
 
-    public static RedissonClient instance() {
+    public static RedissonClient instance()
+    {
         if (instance == null) instance = new Redis();
         return instance.redissonClient;
     }
 
-    public static void close() {
+    public static void close()
+    {
         LOGGER.info("Closing Redis connection...");
         Redis.instance().shutdown();
     }
 
-    private RedissonClient initRedisson(String host, int port, String password) {
+    private RedissonClient initRedisson(String host, int port, String password)
+    {
         final Config config = new Config();
 
         LOGGER.info("Connecting to Redis...");
@@ -48,9 +52,11 @@ public class Redis {
 
 
         RedissonClient redissonClient;
-        try {
+        try
+        {
             redissonClient = Redisson.create(config);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             LOGGER.error("Couldn't connect to Redis!");
             System.exit(1);
             return null;
@@ -59,5 +65,4 @@ public class Redis {
         LOGGER.info("Successfully connected to Redis!");
         return redissonClient;
     }
-
 }

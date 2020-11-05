@@ -16,8 +16,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {
-
+public class Config
+{
     public static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     @JsonProperty(required = true)
@@ -28,13 +28,53 @@ public class Config {
 
     @JsonProperty(required = true)
     public Map<String, Guild> guilds = new HashMap<>();
+    @JsonProperty(required = true)
+    public Redis redis = new Redis();
+    @JsonProperty(required = true)
+    public Mail mail = new Mail();
 
-    public static class Guild {
+    public static Config parseFile(String path) throws JsonProcessingException
+    {
+        final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+
+        final String jsonSource;
+        try
+        {
+            jsonSource = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            LOGGER.info("Successfully loaded config!");
+        } catch (IOException e)
+        {
+            LOGGER.warn("Missing config file!");
+            try
+            {
+                mapper.writeValue(new File("./config.json"), new Config());
+                LOGGER.info("An empty config file has been created! Fill it and run the bot.");
+                System.exit(2);
+                return null;
+            } catch (IOException e1)
+            {
+                LOGGER.error("Couldn't generate config file!");
+                System.exit(1);
+                return null;
+            }
+        }
+        return mapper.readValue(jsonSource, Config.class);
+    }
+
+    public static class Guild
+    {
 
         @JsonProperty(required = true)
         public Roles roles = new Roles();
+        @JsonProperty
+        public Channels channels = new Channels();
+        @JsonProperty
+        public Map<String, AutoRole> autoRoles = new HashMap<>();
+        @JsonProperty
+        public Map<String, OrganizationDisplay> organizationDisplays = new HashMap<>();
 
-        public static class Roles {
+        public static class Roles
+        {
 
             @JsonProperty(required = true)
             public String adminRole = "";
@@ -50,10 +90,8 @@ public class Config {
 
         }
 
-        @JsonProperty
-        public Channels channels = new Channels();
-
-        public static class Channels {
+        public static class Channels
+        {
 
             @JsonProperty
             public String announcements = "";
@@ -63,10 +101,8 @@ public class Config {
 
         }
 
-        @JsonProperty
-        public Map<String, AutoRole> autoRoles = new HashMap<>();
-
-        public static class AutoRole {
+        public static class AutoRole
+        {
 
             @JsonProperty(required = true)
             public String title = "";
@@ -85,13 +121,11 @@ public class Config {
 
         }
 
-        @JsonProperty
-        public Map<String, OrganizationDisplay> organizationDisplays = new HashMap<>();
-
-        public static class OrganizationDisplay {
+        public static class OrganizationDisplay
+        {
 
             @JsonProperty
-            public String title= "";
+            public String title = "";
 
             @JsonProperty
             public Map<String, Field> fields = new HashMap<>();
@@ -100,10 +134,8 @@ public class Config {
 
     }
 
-    @JsonProperty(required = true)
-    public Redis redis = new Redis();
-
-    public static class Redis {
+    public static class Redis
+    {
 
         @JsonProperty(required = true)
         public String host = "127.0.0.1";
@@ -116,10 +148,8 @@ public class Config {
 
     }
 
-    @JsonProperty(required = true)
-    public Mail mail = new Mail();
-
-    public static class Mail {
+    public static class Mail
+    {
 
         @JsonProperty(required = true)
         public String host = "";
@@ -137,28 +167,4 @@ public class Config {
         public String password = "";
 
     }
-
-    public static Config parseFile(String path) throws JsonProcessingException {
-        final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-
-        final String jsonSource;
-        try {
-            jsonSource = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-            LOGGER.info("Successfully loaded config!");
-        } catch (IOException e) {
-            LOGGER.warn("Missing config file!");
-            try {
-                mapper.writeValue(new File("./config.json"), new Config());
-                LOGGER.info("An empty config file has been created! Fill it and run the bot.");
-                System.exit(2);
-                return null;
-            } catch (IOException e1) {
-                LOGGER.error("Couldn't generate config file!");
-                System.exit(1);
-                return null;
-            }
-        }
-        return mapper.readValue(jsonSource, Config.class);
-    }
-
 }

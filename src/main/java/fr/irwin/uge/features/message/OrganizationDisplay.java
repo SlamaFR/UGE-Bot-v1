@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class OrganizationDisplay extends MessageFeature {
-
+public class OrganizationDisplay extends MessageFeature
+{
     private final String title;
     private final Map<String, Field> fields;
 
@@ -29,7 +29,8 @@ public class OrganizationDisplay extends MessageFeature {
     private Date start;
     private Date end;
 
-    public OrganizationDisplay(long guildId, long textChannelId, String title, Map<String, Field> fields) {
+    public OrganizationDisplay(long guildId, long textChannelId, String title, Map<String, Field> fields)
+    {
         super(guildId, textChannelId);
         this.title = title;
         this.fields = fields;
@@ -41,7 +42,8 @@ public class OrganizationDisplay extends MessageFeature {
     public OrganizationDisplay(@JsonProperty("guildId") long guildId, @JsonProperty("textChannelId") long textChannelId,
                                @JsonProperty("title") String title, @JsonProperty("fields") Map<String, Field> fields,
                                @JsonProperty("messageId") long messageId, @JsonProperty("start") Date start,
-                               @JsonProperty("end") Date end) {
+                               @JsonProperty("end") Date end)
+    {
         super(guildId, textChannelId);
         this.title = title;
         this.fields = fields;
@@ -51,7 +53,8 @@ public class OrganizationDisplay extends MessageFeature {
     }
 
     @Override
-    public void send() {
+    public void send()
+    {
         final MessageEmbed messageEmbed = getEmbed();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
@@ -66,27 +69,33 @@ public class OrganizationDisplay extends MessageFeature {
     }
 
     @Override
-    protected void start(Message m) {
+    protected void start(Message m)
+    {
         messageId = m.getIdLong();
         fields.keySet().forEach(emote -> m.addReaction(emote.replace(">", "")).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
                 e -> e.getMessageIdLong() == messageId && RolesUtils.isTeacher(e.getMember()),
                 (e, ew) -> {
                     String emote;
-                    try {
+                    try
+                    {
                         emote = e.getReactionEmote().getEmoji();
-                    } catch (IllegalStateException ex) {
+                    } catch (IllegalStateException ex)
+                    {
                         emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
                     }
 
-                    if (fields.containsKey(emote)) {
+                    if (fields.containsKey(emote))
+                    {
                         fields.get(emote).cycleState();
                         update();
                         e.getReaction().removeReaction(e.getUser()).queue();
-                    } else if (emote.equals("❌")) {
+                    } else if (emote.equals("❌"))
+                    {
                         ew.close();
                         RedisUtils.removeFeature(e.getGuild(), messageId, this);
-                    } else if (emote.equals("🔄")) {
+                    } else if (emote.equals("🔄"))
+                    {
                         update();
                         e.getReaction().removeReaction(e.getUser()).queue();
                     }
@@ -95,7 +104,8 @@ public class OrganizationDisplay extends MessageFeature {
                 .build();
     }
 
-    private void update() {
+    private void update()
+    {
         setDates();
         final MessageEmbed messageEmbed = getEmbed();
 
@@ -113,14 +123,16 @@ public class OrganizationDisplay extends MessageFeature {
         RedisUtils.addFeature(guild, messageId, this);
     }
 
-    private MessageEmbed getEmbed() {
+    private MessageEmbed getEmbed()
+    {
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(title)
                 .setDescription(String.format("Semaine du **%s** au **%s**",
                         DateUtils.formatDate(start), DateUtils.formatDate(end)));
 
-        for (Map.Entry<String, Field> entry : fields.entrySet()) {
+        for (Map.Entry<String, Field> entry : fields.entrySet())
+        {
             Field field = entry.getValue();
             builder.addField(field.name, field.state.value, field.inline);
         }
@@ -128,7 +140,8 @@ public class OrganizationDisplay extends MessageFeature {
         return builder.build();
     }
 
-    private void setDates() {
+    private void setDates()
+    {
         Calendar calendar = Calendar.getInstance(Locale.FRANCE);
         calendar.set(Calendar.DAY_OF_WEEK, 2);
         this.start = calendar.getTime();
@@ -136,25 +149,8 @@ public class OrganizationDisplay extends MessageFeature {
         this.end = calendar.getTime();
     }
 
-    public static class Field {
-
-        private final String name;
-        private final boolean inline;
-        private State state;
-
-        @JsonCreator
-        public Field(@JsonProperty("name") String name, @JsonProperty("inline") boolean inline) {
-            this.name = name;
-            this.inline = inline;
-            this.state = State.UNKNOWN;
-        }
-
-        private void cycleState() {
-            state = State.values()[(state.ordinal() + 1) % State.values().length];
-        }
-    }
-
-    public enum State {
+    public enum State
+    {
         UNKNOWN("*Information à venir*"),
         ON_SITE("Présentiel"),
         HYBRID("Hybride"),
@@ -162,8 +158,30 @@ public class OrganizationDisplay extends MessageFeature {
 
         private final String value;
 
-        State(String value) {
+        State(String value)
+        {
             this.value = value;
+        }
+    }
+
+    public static class Field
+    {
+
+        private final String name;
+        private final boolean inline;
+        private State state;
+
+        @JsonCreator
+        public Field(@JsonProperty("name") String name, @JsonProperty("inline") boolean inline)
+        {
+            this.name = name;
+            this.inline = inline;
+            this.state = State.UNKNOWN;
+        }
+
+        private void cycleState()
+        {
+            state = State.values()[(state.ordinal() + 1) % State.values().length];
         }
     }
 }

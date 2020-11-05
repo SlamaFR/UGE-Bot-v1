@@ -20,43 +20,54 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-public class MailManager {
-
+public class MailManager
+{
     public static final String SEPARATOR = "---------------------------------------------------------------------";
     private static final Logger LOGGER = LoggerFactory.getLogger(MailManager.class);
 
     private Folder inbox;
 
-    public MailManager() throws MessagingException {
+    public MailManager() throws MessagingException
+    {
         this.inbox = getStore().getFolder("INBOX");
         this.inbox.open(Folder.READ_ONLY);
-        this.inbox.addConnectionListener(new ConnectionAdapter() {
+        this.inbox.addConnectionListener(new ConnectionAdapter()
+        {
             @Override
-            public void disconnected(ConnectionEvent e) {
+            public void disconnected(ConnectionEvent e)
+            {
                 super.disconnected(e);
-                try {
+                try
+                {
                     LOGGER.info("Keeping mail server connection alive");
                     inbox = getStore().getFolder("INBOX");
                     inbox.open(Folder.READ_ONLY);
-                } catch (MessagingException ex) {
+                } catch (MessagingException ex)
+                {
                     LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                 }
             }
         });
 
-        TaskScheduler.scheduleRepeating(new Runnable() {
+        TaskScheduler.scheduleRepeating(new Runnable()
+        {
             private int lastCount = inbox.getMessageCount();
 
             @Override
-            public void run() {
-                try {
+            public void run()
+            {
+                try
+                {
                     int count = inbox.getMessageCount();
                     int delta = count - lastCount;
-                    if (delta > 0) {
+                    if (delta > 0)
+                    {
                         Message[] messages = inbox.getMessages(lastCount + 1, count);
-                        for (Message message : messages) {
+                        for (Message message : messages)
+                        {
                             LOGGER.info("[MAIL] Received a new mail!");
-                            if (!MailUtils.isFromMoodle(message)) {
+                            if (!MailUtils.isFromMoodle(message))
+                            {
                                 LOGGER.info("[MAIL] Not from Moodle, aborting...");
                                 continue;
                             }
@@ -65,32 +76,42 @@ public class MailManager {
                         }
                     }
                     lastCount = count;
-                } catch (FolderClosedException e) {
-                    try {
+                } catch (FolderClosedException e)
+                {
+                    try
+                    {
                         LOGGER.info("Keeping mail server connection alive");
                         inbox.open(Folder.READ_ONLY);
-                    } catch (MessagingException ex) {
+                    } catch (MessagingException ex)
+                    {
                         LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                     }
-                } catch (StoreClosedException e) {
-                    try {
+                } catch (StoreClosedException e)
+                {
+                    try
+                    {
                         inbox = getStore().getFolder("INBOX");
-                    } catch (MessagingException ex) {
+                    } catch (MessagingException ex)
+                    {
                         LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                     }
-                } catch (MessagingException | IOException e) {
+                } catch (MessagingException | IOException e)
+                {
                     LOGGER.warn("[MAIL][Unstable] Mail failed to parse/read!", e);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOGGER.warn("[MAIL][Unstable] Mail dispatch failed!", e);
                 }
             }
         }, 120 * 1000);
     }
 
-    private void dispatchMessage(Message message) throws IOException, MessagingException {
+    private void dispatchMessage(Message message) throws IOException, MessagingException
+    {
         String content = MailUtils.extractContent(message);
         String courseId = MailUtils.getCourseId(message);
-        if (courseId == null) {
+        if (courseId == null)
+        {
             LOGGER.info("[MAIL] No course id detected, aborting...");
             return;
         }
@@ -102,13 +123,17 @@ public class MailManager {
         TextChannel textChannel = null;
         Color color = null;
         String avatarUrl = null;
-        for (Guild guild : UGEBot.JDA().getGuilds()) {
+        for (Guild guild : UGEBot.JDA().getGuilds())
+        {
             System.out.println("Checking " + guild);
             textChannel = ChannelUtils.getCourseChannel(guild, courseId);
-            if (textChannel != null) {
-                if (!senderName.isEmpty()) {
+            if (textChannel != null)
+            {
+                if (!senderName.isEmpty())
+                {
                     List<Member> members = guild.retrieveMembersByPrefix(senderName, 1).get();
-                    if (!members.isEmpty()) {
+                    if (!members.isEmpty())
+                    {
                         color = members.get(0).getColor();
                         avatarUrl = members.get(0).getUser().getAvatarUrl();
                     }
@@ -116,7 +141,8 @@ public class MailManager {
                 break;
             }
         }
-        if (textChannel == null) {
+        if (textChannel == null)
+        {
             LOGGER.info("[MAIL] No text channel found, aborting...");
             return;
         }
@@ -135,7 +161,8 @@ public class MailManager {
         ).queue();
     }
 
-    private Properties getProperties() {
+    private Properties getProperties()
+    {
         Properties properties = new Properties();
         properties.put(String.format("mail.%s.host", UGEBot.config().mail.protocol), UGEBot.config().mail.host);
         properties.put(String.format("mail.%s.port", UGEBot.config().mail.protocol), String.valueOf(UGEBot.config().mail.port));
@@ -143,11 +170,11 @@ public class MailManager {
         return properties;
     }
 
-    private Store getStore() throws MessagingException {
+    private Store getStore() throws MessagingException
+    {
         Session emailSession = Session.getDefaultInstance(getProperties());
         Store store = emailSession.getStore(String.format("%ss", UGEBot.config().mail.protocol));
         store.connect(UGEBot.config().mail.host, UGEBot.config().mail.user, UGEBot.config().mail.password);
         return store;
     }
-
 }

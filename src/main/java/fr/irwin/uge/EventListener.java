@@ -1,9 +1,9 @@
 package fr.irwin.uge;
 
 import fr.irwin.uge.commands.core.CommandMap;
+import fr.irwin.uge.features.channel.TrafficNotifier;
 import fr.irwin.uge.features.message.AutoRole;
 import fr.irwin.uge.features.message.OrganizationDisplay;
-import fr.irwin.uge.features.channel.TrafficNotifier;
 import fr.irwin.uge.redis.Redis;
 import fr.irwin.uge.utils.RedisUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,17 +19,19 @@ import javax.annotation.Nonnull;
 /**
  * Created on 04/10/2018.
  */
-public class EventListener extends ListenerAdapter {
-
+public class EventListener extends ListenerAdapter
+{
     private final CommandMap commandMap;
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    public EventListener(CommandMap commandMap) {
+    public EventListener(CommandMap commandMap)
+    {
         this.commandMap = commandMap;
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event)
+    {
         super.onGuildMessageReceived(event);
         if (event.getAuthor().isBot()) return;
 
@@ -38,10 +40,12 @@ public class EventListener extends ListenerAdapter {
     }
 
     @Override
-    public void onReady(@Nonnull ReadyEvent event) {
+    public void onReady(@Nonnull ReadyEvent event)
+    {
         super.onReady(event);
 
-        for (Guild guild : event.getJDA().getGuilds()) {
+        for (Guild guild : event.getJDA().getGuilds())
+        {
             Redis.instance().getMap(RedisUtils.getKey(guild, AutoRole.class)).forEach((msgId, o) -> {
                 ((AutoRole) o).restore(String.valueOf(msgId), null);
             });
@@ -52,7 +56,8 @@ public class EventListener extends ListenerAdapter {
         }
 
         TrafficNotifier manager = RedisUtils.getObject(TrafficNotifier.class);
-        if (manager != null) {
+        if (manager != null)
+        {
             TrafficNotifier.instance(manager);
             LOGGER.info("Restored TrafficNotifier!");
         }

@@ -20,8 +20,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class CallManager {
-
+public class CallManager
+{
     public static final String CALL_PRESENT_EMOTE = "🙋";
 
     private final long guildId;
@@ -32,7 +32,8 @@ public class CallManager {
     private final Set<String> presents;
     private final File resultFile;
 
-    public CallManager(TextChannel textChannel, Member member, int timeout) {
+    public CallManager(TextChannel textChannel, Member member, int timeout)
+    {
         this.guildId = textChannel.getGuild().getIdLong();
         this.textChannelId = textChannel.getIdLong();
         this.teacherUserId = member.getIdLong();
@@ -45,7 +46,8 @@ public class CallManager {
         this.resultFile = new File(String.format("%s_#%s_%s.txt", member.getEffectiveName().replace(' ', '_'), textChannel.getName(), df.format(date)));
     }
 
-    private long sendMessage(String teacherName) {
+    private long sendMessage(String teacherName)
+    {
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Appel demandé par " + teacherName)
                 .setDescription(String.format("Vous avez %d minute%s pour cliquer sur %s afin confirmer votre présence.",
@@ -77,7 +79,8 @@ public class CallManager {
         return message.getIdLong();
     }
 
-    private void close(String teacherName) {
+    private void close(String teacherName)
+    {
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Appel demandé par " + teacherName)
                 .setDescription(String.format("L'appel est terminé. %d personnes étaient présentes.", presents.size()))
@@ -90,18 +93,21 @@ public class CallManager {
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
         if (textChannel == null) return;
 
-        try {
+        try
+        {
             final Message message = textChannel.retrieveMessageById(messageId).complete();
             message.editMessage(embed).queue();
             message.removeReaction(CALL_PRESENT_EMOTE).queue();
-        } catch (ErrorResponseException e) {
+        } catch (ErrorResponseException e)
+        {
             return;
         }
 
         final Member member = guild.getMemberById(teacherUserId);
         if (member == null) return;
 
-        try {
+        try
+        {
             fillFile(teacherName, textChannel.getName());
 
             member.getUser().openPrivateChannel().queue(privateChannel -> {
@@ -109,13 +115,15 @@ public class CallManager {
                         .addFile(resultFile)
                         .queue();
             });
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             textChannel.sendMessage("Une erreur est survenue lors de la fin de l'appel. Contacter votre administrateur.").queue();
             e.printStackTrace();
         }
     }
 
-    private void fillFile(String teacherName, String channelName) throws IOException {
+    private void fillFile(String teacherName, String channelName) throws IOException
+    {
         FileWriter fw = new FileWriter(resultFile);
 
         Calendar calendar = Calendar.getInstance();
@@ -131,5 +139,4 @@ public class CallManager {
         fw.flush();
         fw.close();
     }
-
 }

@@ -15,10 +15,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Queue;
 import java.util.*;
 
-public class TicketManager extends ListenerAdapter {
-
+public class TicketManager extends ListenerAdapter
+{
     public static final int QUEUE_LIST_MAX_LINES = 5;
     public static final int COOLDOWN = 180;
     public static final int QUEUE_TIMEOUT = 3600;
@@ -34,7 +35,8 @@ public class TicketManager extends ListenerAdapter {
     private long currentTicketMemberId = 0L;
     private TaskScheduler timeoutTask;
 
-    private TicketManager(TextChannel textChannel) {
+    private TicketManager(TextChannel textChannel)
+    {
         this.jda = textChannel.getJDA();
         this.guildId = textChannel.getGuild().getIdLong();
         this.textChannelId = textChannel.getIdLong();
@@ -45,17 +47,20 @@ public class TicketManager extends ListenerAdapter {
         updateEmbed();
     }
 
-    public static TicketManager getTicketManager(TextChannel textChannel) {
+    public static TicketManager getTicketManager(TextChannel textChannel)
+    {
         if (hasOpenTickedManager(textChannel))
             return managers.get(textChannel.getIdLong());
         return managers.put(textChannel.getIdLong(), new TicketManager(textChannel));
     }
 
-    public static boolean hasOpenTickedManager(TextChannel textChannel) {
+    public static boolean hasOpenTickedManager(TextChannel textChannel)
+    {
         return managers.containsKey(textChannel.getIdLong());
     }
 
-    public boolean openTicket(Member member) {
+    public boolean openTicket(Member member)
+    {
         if (isAwaiting(member)) return false;
         if (isCoolingDown(member)) return false;
 
@@ -69,19 +74,22 @@ public class TicketManager extends ListenerAdapter {
         return true;
     }
 
-    public void takeNextTicket(Member teacher) {
+    public void takeNextTicket(Member teacher)
+    {
         final Guild guild = jda.getGuildById(guildId);
         if (guild == null) return;
 
-        if (queue.isEmpty()) {
-            currentTicketMemberId=0;
+        if (queue.isEmpty())
+        {
+            currentTicketMemberId = 0;
             updateEmbed();
             return;
         }
         currentTicketMemberId = queue.poll();
 
         final Member student = guild.getMemberById(currentTicketMemberId);
-        if (student == null) {
+        if (student == null)
+        {
             currentTicketMemberId = 0;
             return;
         }
@@ -98,32 +106,38 @@ public class TicketManager extends ListenerAdapter {
         teacher.getGuild().moveVoiceMember(student, teacherVoiceState.getChannel()).queue();
     }
 
-    public void close() {
+    public void close()
+    {
         final Guild guild = jda.getGuildById(guildId);
         if (guild == null) return;
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
         if (textChannel == null) return;
 
-        try {
+        try
+        {
             final Message message = textChannel.retrieveMessageById(ticketManagementMessageId).complete();
             message.delete().queue();
-        } catch (ErrorResponseException ignored) {
+        } catch (ErrorResponseException ignored)
+        {
         }
 
         managers.remove(textChannelId);
         UGEBot.JDA().removeEventListener(this);
     }
 
-    private String getStudentList() {
-        if (queue.isEmpty()) {
+    private String getStudentList()
+    {
+        if (queue.isEmpty())
+        {
             return "*Aucune*";
         }
 
         final StringBuilder stringBuilder = new StringBuilder();
 
         int i = 0;
-        for (Long l : queue) {
+        for (Long l : queue)
+        {
             if (i == QUEUE_LIST_MAX_LINES) break;
             if (stringBuilder.length() > 0) stringBuilder.append("\n");
             stringBuilder.append(String.format("• <@%d>", l));
@@ -133,7 +147,8 @@ public class TicketManager extends ListenerAdapter {
         return stringBuilder.toString();
     }
 
-    private MessageEmbed getEmbed() {
+    private MessageEmbed getEmbed()
+    {
         final EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("File d'attente")
                 .setDescription("Cliquez sur ⏭ ou envoyez `!next` pour passer à la personne suivante.\n" +
@@ -145,29 +160,34 @@ public class TicketManager extends ListenerAdapter {
             builder.addField("Tour actuel", String.format("<@%d>", currentTicketMemberId), false);
 
         builder.addField("Personnes en attente", getStudentList(), false);
-        if (queue.size() > 5) {
+        if (queue.size() > 5)
+        {
             int rest = queue.size() - 5;
             builder.setFooter(String.format("Et %d autre%s", rest, rest > 1 ? "s" : ""));
         }
         return builder.build();
     }
 
-    private void updateEmbed() {
+    private void updateEmbed()
+    {
         final Guild guild = jda.getGuildById(guildId);
         if (guild == null) return;
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
         if (textChannel == null) return;
 
-        try {
+        try
+        {
             final Message message = textChannel.retrieveMessageById(ticketManagementMessageId).complete();
             message.editMessage(getEmbed()).queue();
-        } catch (ErrorResponseException e) {
+        } catch (ErrorResponseException e)
+        {
             sendEmbed();
         }
     }
 
-    private void sendEmbed() {
+    private void sendEmbed()
+    {
         final Guild guild = jda.getGuildById(guildId);
         if (guild == null) return;
 
@@ -184,7 +204,8 @@ public class TicketManager extends ListenerAdapter {
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> {
             return e.getMessageIdLong() == message.getIdLong() && !e.getUser().isBot();
         }, (e, ew) -> {
-            switch (EmotesUtils.getEmote(e.getReactionEmote())) {
+            switch (EmotesUtils.getEmote(e.getReactionEmote()))
+            {
                 case "🙋":
                     openTicket(e.getMember());
                     e.getReaction().removeReaction(e.getUser()).queue();
@@ -204,24 +225,29 @@ public class TicketManager extends ListenerAdapter {
         ticketManagementMessageId = message.getIdLong();
     }
 
-    private boolean isAwaiting(Member member) {
+    private boolean isAwaiting(Member member)
+    {
         return queue.contains(member.getIdLong());
     }
 
-    private boolean isCoolingDown(Member member) {
+    private boolean isCoolingDown(Member member)
+    {
         return coolingDown.contains(member.getIdLong());
     }
 
-    private TaskScheduler getTimeoutTask() {
+    private TaskScheduler getTimeoutTask()
+    {
         return TaskScheduler.scheduleDelayed(this::close, QUEUE_TIMEOUT * 1000);
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event)
+    {
         super.onGuildMessageReceived(event);
         final User user = UGEBot.JDA().getSelfUser();
 
-        if (event.getMessage().getType().equals(MessageType.CHANNEL_PINNED_ADD) && event.getAuthor().equals(user)) {
+        if (event.getMessage().getType().equals(MessageType.CHANNEL_PINNED_ADD) && event.getAuthor().equals(user))
+        {
             event.getMessage().delete().queue();
         }
     }

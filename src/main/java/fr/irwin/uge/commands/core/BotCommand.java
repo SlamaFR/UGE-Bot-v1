@@ -5,28 +5,31 @@ import java.lang.reflect.Method;
 /**
  * Created on 15/03/2018.
  */
-public final class BotCommand {
-
+public final class BotCommand
+{
     private final String name;
     private final Object object;
     private final Method method;
 
-    BotCommand(String name, Object object, Method method) {
+    BotCommand(String name, Object object, Method method)
+    {
         this.name = name;
         this.object = object;
         this.method = method;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public Object getObject() {
+    public Object getObject()
+    {
         return object;
     }
 
-    public Method getMethod() {
+    public Method getMethod()
+    {
         return method;
     }
-
 }

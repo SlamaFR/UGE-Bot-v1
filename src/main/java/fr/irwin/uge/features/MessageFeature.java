@@ -9,13 +9,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MessageFeature {
-
+public abstract class MessageFeature
+{
     protected final long guildId;
     protected final long textChannelId;
     protected transient final Logger logger;
 
-    protected MessageFeature(long guildId, long textChannelId) {
+    protected MessageFeature(long guildId, long textChannelId)
+    {
         this.guildId = guildId;
         this.textChannelId = textChannelId;
         this.logger = LoggerFactory.getLogger(getClass());
@@ -23,7 +24,8 @@ public abstract class MessageFeature {
 
     public abstract void send();
 
-    public void restore(String messageId, @Nullable Runnable success) {
+    public void restore(String messageId, @Nullable Runnable success)
+    {
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
         if (guild == null) return;
 
@@ -41,5 +43,4 @@ public abstract class MessageFeature {
     }
 
     protected abstract void start(Message message);
-
 }

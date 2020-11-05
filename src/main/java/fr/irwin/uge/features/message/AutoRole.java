@@ -3,8 +3,8 @@ package fr.irwin.uge.features.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.irwin.uge.UGEBot;
-import fr.irwin.uge.features.MessageFeature;
 import fr.irwin.uge.config.Config;
+import fr.irwin.uge.features.MessageFeature;
 import fr.irwin.uge.internals.EventWaiter;
 import fr.irwin.uge.utils.RedisUtils;
 import fr.irwin.uge.utils.RolesUtils;
@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-public class AutoRole extends MessageFeature {
-
+public class AutoRole extends MessageFeature
+{
     private final String title;
     private final String description;
     private final Map<String, String> roles;
@@ -26,7 +26,8 @@ public class AutoRole extends MessageFeature {
     private final boolean rolesList;
     private final int maxRoles;
 
-    public AutoRole(@NotNull TextChannel textChannel, String title, String description, Map<String, String> roles, boolean rolesList, int maxRoles) {
+    public AutoRole(@NotNull TextChannel textChannel, String title, String description, Map<String, String> roles, boolean rolesList, int maxRoles)
+    {
         super(textChannel.getGuild().getIdLong(), textChannel.getIdLong());
         this.title = title;
         this.description = description;
@@ -38,7 +39,8 @@ public class AutoRole extends MessageFeature {
         fillRolesCollection();
     }
 
-    public AutoRole(@NotNull TextChannel textChannel, Config.Guild.AutoRole config) {
+    public AutoRole(@NotNull TextChannel textChannel, Config.Guild.AutoRole config)
+    {
         this(textChannel, config.title, config.description, config.roles, config.rolesList, config.maxRoles);
     }
 
@@ -47,7 +49,8 @@ public class AutoRole extends MessageFeature {
     public AutoRole(@JsonProperty("guildId") long guildId, @JsonProperty("textChannelId") long textChannelId,
                     @JsonProperty("title") String title, @JsonProperty("description") String description,
                     @JsonProperty("roles") Map<String, String> roles, @JsonProperty("rolesList") boolean rolesList,
-                    @JsonProperty("maxRoles") int maxRoles) {
+                    @JsonProperty("maxRoles") int maxRoles)
+    {
         super(guildId, textChannelId);
         this.title = title;
         this.description = description;
@@ -60,7 +63,8 @@ public class AutoRole extends MessageFeature {
     }
 
     @Override
-    public void send() {
+    public void send()
+    {
         final MessageEmbed messageEmbed = getMessageEmbed();
         if (messageEmbed == null) return;
 
@@ -76,27 +80,33 @@ public class AutoRole extends MessageFeature {
     }
 
     @Override
-    protected void start(Message m) {
+    protected void start(Message m)
+    {
         roles.keySet().stream().sorted().map(e -> e.replace(">", "")).forEach(e -> m.addReaction(e).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
                 e -> e.getMessageIdLong() == m.getIdLong() && !e.getUser().isBot() &&
                         (RolesUtils.commonRoles(e.getMember().getRoles(), rolesCollection) < maxRoles || RolesUtils.isAdmin(e.getMember())),
                 (e, ew) -> {
                     String emote;
-                    try {
+                    try
+                    {
                         emote = e.getReactionEmote().getEmoji();
-                    } catch (IllegalStateException ex) {
+                    } catch (IllegalStateException ex)
+                    {
                         emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
                     }
-                    if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember())) {
+                    if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember()))
+                    {
                         ew.close();
                         RedisUtils.removeFeature(e.getGuild(), m.getIdLong(), this);
                         return;
                     }
                     Role role = m.getGuild().getRoleById(roles.get(emote));
-                    if (role != null) {
+                    if (role != null)
+                    {
                         m.getGuild().addRoleToMember(e.getMember(), role).complete();
-                    } else {
+                    } else
+                    {
                         ew.close();
                         m.delete().queue();
                     }
@@ -105,34 +115,42 @@ public class AutoRole extends MessageFeature {
                 .build();
     }
 
-    private void fillRolesCollection() {
-        for (Map.Entry<String, String> entry : roles.entrySet()) {
+    private void fillRolesCollection()
+    {
+        for (Map.Entry<String, String> entry : roles.entrySet())
+        {
             Role role = UGEBot.JDA().getRoleById(entry.getValue());
-            if (role == null) {
+            if (role == null)
+            {
                 return;
             }
             rolesCollection.add(role);
         }
     }
 
-    private MessageEmbed getMessageEmbed() {
+    private MessageEmbed getMessageEmbed()
+    {
         final String roleList = formatRoleList();
         if (roleList == null) return null;
 
         final EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(title)
                 .setDescription(description);
-        if (rolesList) {
+        if (rolesList)
+        {
             builder.addField("Liste des rôles", roleList, false);
         }
         return builder.build();
     }
 
-    private String formatRoleList() {
+    private String formatRoleList()
+    {
         final StringBuilder stringBuilder = new StringBuilder();
-        for (Map.Entry<String, String> entry : this.roles.entrySet()) {
+        for (Map.Entry<String, String> entry : this.roles.entrySet())
+        {
             Role role = UGEBot.JDA().getRoleById(entry.getValue());
-            if (role == null) {
+            if (role == null)
+            {
                 return null;
             }
             if (stringBuilder.length() > 0) stringBuilder.append("\n\n");
@@ -140,5 +158,4 @@ public class AutoRole extends MessageFeature {
         }
         return stringBuilder.toString();
     }
-
 }
