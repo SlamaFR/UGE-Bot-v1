@@ -27,18 +27,30 @@ public abstract class MessageFeature
     public void restore(String messageId, @Nullable Runnable success)
     {
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         textChannel.retrieveMessageById(messageId).queue(message -> {
-            if (!message.getAuthor().equals(UGEBot.JDA().getSelfUser())) return;
+            if (!message.getAuthor().equals(UGEBot.JDA().getSelfUser()))
+            {
+                return;
+            }
 
             start(message);
             RedisUtils.addFeature(textChannel.getGuild(), message.getIdLong(), this);
             logger.info("Restored {} on {}!", getClass().getSimpleName(), messageId);
-            if (success != null) success.run();
+            if (success != null)
+            {
+                success.run();
+            }
         }, failure -> logger.warn("Failed to restore {} on {}!", getClass().getSimpleName(), messageId));
     }
 

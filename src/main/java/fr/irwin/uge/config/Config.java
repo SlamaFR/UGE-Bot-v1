@@ -42,7 +42,8 @@ public class Config
         {
             jsonSource = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
             LOGGER.info("Successfully loaded config!");
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             LOGGER.warn("Missing config file!");
             try
@@ -51,7 +52,8 @@ public class Config
                 LOGGER.info("An empty config file has been created! Fill it and run the bot.");
                 System.exit(2);
                 return null;
-            } catch (IOException e1)
+            }
+            catch (IOException e1)
             {
                 LOGGER.error("Couldn't generate config file!");
                 System.exit(1);
@@ -87,7 +89,6 @@ public class Config
 
             @JsonProperty(required = true)
             public String studentRole = "";
-
         }
 
         public static class Channels
@@ -98,7 +99,6 @@ public class Config
 
             @JsonProperty
             public Map<String, Long> elearning = new HashMap<>();
-
         }
 
         public static class AutoRole
@@ -118,7 +118,6 @@ public class Config
 
             @JsonProperty(required = true)
             public Map<String, String> roles;
-
         }
 
         public static class OrganizationDisplay
@@ -129,9 +128,7 @@ public class Config
 
             @JsonProperty
             public Map<String, Field> fields = new HashMap<>();
-
         }
-
     }
 
     public static class Redis
@@ -145,7 +142,6 @@ public class Config
 
         @JsonProperty(required = true)
         public String password = "";
-
     }
 
     public static class Mail
@@ -165,6 +161,5 @@ public class Config
 
         @JsonProperty(required = true)
         public String password = "";
-
     }
 }

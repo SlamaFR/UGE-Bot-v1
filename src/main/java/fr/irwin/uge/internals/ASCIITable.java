@@ -159,7 +159,8 @@ public class ASCIITable
             if (!empty(n - 1, col) || !empty(n, col))
             {
                 builder.append(String.valueOf(HORIZONTAL).repeat(colWidths.get(col)));
-            } else
+            }
+            else
             {
                 builder.append(String.valueOf(' ').repeat(colWidths.get(col)));
             }

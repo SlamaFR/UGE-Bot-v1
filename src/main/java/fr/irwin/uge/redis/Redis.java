@@ -25,7 +25,10 @@ public class Redis
 
     public static RedissonClient instance()
     {
-        if (instance == null) instance = new Redis();
+        if (instance == null)
+        {
+            instance = new Redis();
+        }
         return instance.redissonClient;
     }
 
@@ -44,18 +47,15 @@ public class Redis
         config.setCodec(new JsonJacksonCodec());
         config.setThreads(2);
         config.setNettyThreads(2);
-        config.useSingleServer()
-                .setAddress("redis://" + host + ":" + port)
-                .setPassword(password)
-                .setDatabase(0)
-                .setClientName("uge-bot");
-
+        config.useSingleServer().setAddress(
+                "redis://" + host + ":" + port).setPassword(password).setDatabase(0).setClientName("uge-bot");
 
         RedissonClient redissonClient;
         try
         {
             redissonClient = Redisson.create(config);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             LOGGER.error("Couldn't connect to Redis!");
             System.exit(1);

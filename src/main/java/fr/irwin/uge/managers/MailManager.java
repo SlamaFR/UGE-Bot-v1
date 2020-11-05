@@ -42,7 +42,8 @@ public class MailManager
                     LOGGER.info("Keeping mail server connection alive");
                     inbox = getStore().getFolder("INBOX");
                     inbox.open(Folder.READ_ONLY);
-                } catch (MessagingException ex)
+                }
+                catch (MessagingException ex)
                 {
                     LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                 }
@@ -76,29 +77,35 @@ public class MailManager
                         }
                     }
                     lastCount = count;
-                } catch (FolderClosedException e)
+                }
+                catch (FolderClosedException e)
                 {
                     try
                     {
                         LOGGER.info("Keeping mail server connection alive");
                         inbox.open(Folder.READ_ONLY);
-                    } catch (MessagingException ex)
+                    }
+                    catch (MessagingException ex)
                     {
                         LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                     }
-                } catch (StoreClosedException e)
+                }
+                catch (StoreClosedException e)
                 {
                     try
                     {
                         inbox = getStore().getFolder("INBOX");
-                    } catch (MessagingException ex)
+                    }
+                    catch (MessagingException ex)
                     {
                         LOGGER.warn("[UNSTABLE] MailManager failed!", ex);
                     }
-                } catch (MessagingException | IOException e)
+                }
+                catch (MessagingException | IOException e)
                 {
                     LOGGER.warn("[MAIL][Unstable] Mail failed to parse/read!", e);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     LOGGER.warn("[MAIL][Unstable] Mail dispatch failed!", e);
                 }
@@ -150,15 +157,7 @@ public class MailManager
         LOGGER.info("[MAIL] Sender name: {}", senderName);
         LOGGER.info("[MAIL] Course name: {}", courseName);
         LOGGER.info("[MAIL] Sending e-Learning announcement!");
-        textChannel.sendMessage(
-                new EmbedBuilder()
-                        .setTitle(MoreObjects.firstNonNull(courseName, "Annonce"))
-                        .setAuthor(senderName, null, avatarUrl)
-                        .setDescription(content)
-                        .setColor(color)
-                        .setFooter("Via e-Learning")
-                        .build()
-        ).queue();
+        textChannel.sendMessage(new EmbedBuilder().setTitle(MoreObjects.firstNonNull(courseName, "Annonce")).setAuthor(senderName, null, avatarUrl).setDescription(content).setColor(color).setFooter("Via e-Learning").build()).queue();
     }
 
     private Properties getProperties()

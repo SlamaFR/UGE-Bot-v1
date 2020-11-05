@@ -34,7 +34,8 @@ public class JSONFetcher
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             LOGGER.warn("Can't retrieve traffic informations from SIEGE-API!");
             return new JSONObject();

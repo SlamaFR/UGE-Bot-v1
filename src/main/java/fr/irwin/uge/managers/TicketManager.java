@@ -50,7 +50,9 @@ public class TicketManager extends ListenerAdapter
     public static TicketManager getTicketManager(TextChannel textChannel)
     {
         if (hasOpenTickedManager(textChannel))
+        {
             return managers.get(textChannel.getIdLong());
+        }
         return managers.put(textChannel.getIdLong(), new TicketManager(textChannel));
     }
 
@@ -61,8 +63,14 @@ public class TicketManager extends ListenerAdapter
 
     public boolean openTicket(Member member)
     {
-        if (isAwaiting(member)) return false;
-        if (isCoolingDown(member)) return false;
+        if (isAwaiting(member))
+        {
+            return false;
+        }
+        if (isCoolingDown(member))
+        {
+            return false;
+        }
 
         queue.offer(member.getIdLong());
         coolingDown.add(member.getIdLong());
@@ -77,7 +85,10 @@ public class TicketManager extends ListenerAdapter
     public void takeNextTicket(Member teacher)
     {
         final Guild guild = jda.getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         if (queue.isEmpty())
         {
@@ -100,8 +111,14 @@ public class TicketManager extends ListenerAdapter
         final GuildVoiceState teacherVoiceState = teacher.getVoiceState();
         final GuildVoiceState studentVoiceState = student.getVoiceState();
 
-        if (teacherVoiceState == null || studentVoiceState == null) return;
-        if (!teacherVoiceState.inVoiceChannel() || !studentVoiceState.inVoiceChannel()) return;
+        if (teacherVoiceState == null || studentVoiceState == null)
+        {
+            return;
+        }
+        if (!teacherVoiceState.inVoiceChannel() || !studentVoiceState.inVoiceChannel())
+        {
+            return;
+        }
 
         teacher.getGuild().moveVoiceMember(student, teacherVoiceState.getChannel()).queue();
     }
@@ -109,16 +126,23 @@ public class TicketManager extends ListenerAdapter
     public void close()
     {
         final Guild guild = jda.getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         try
         {
             final Message message = textChannel.retrieveMessageById(ticketManagementMessageId).complete();
             message.delete().queue();
-        } catch (ErrorResponseException ignored)
+        }
+        catch (ErrorResponseException ignored)
         {
         }
 
@@ -138,8 +162,14 @@ public class TicketManager extends ListenerAdapter
         int i = 0;
         for (Long l : queue)
         {
-            if (i == QUEUE_LIST_MAX_LINES) break;
-            if (stringBuilder.length() > 0) stringBuilder.append("\n");
+            if (i == QUEUE_LIST_MAX_LINES)
+            {
+                break;
+            }
+            if (stringBuilder.length() > 0)
+            {
+                stringBuilder.append("\n");
+            }
             stringBuilder.append(String.format("• <@%d>", l));
             i++;
         }
@@ -149,15 +179,15 @@ public class TicketManager extends ListenerAdapter
 
     private MessageEmbed getEmbed()
     {
-        final EmbedBuilder builder = new EmbedBuilder()
-                .setTitle("File d'attente")
-                .setDescription("Cliquez sur ⏭ ou envoyez `!next` pour passer à la personne suivante.\n" +
-                        "Cliquez sur " + EmotesUtils.NO + " ou envoyez `!close` pour fermer cette file d'attente.\n\n" +
-                        "Cliquez sur 🙋 ou envoyez `!ticket` pour rejoindre la file d'attente.")
-                .setColor(new Color(0x3498db));
+        final EmbedBuilder builder = new EmbedBuilder().setTitle("File d'attente").setDescription(
+                "Cliquez sur ⏭ ou envoyez `!next` pour passer à la personne suivante.\n" + "Cliquez sur " +
+                EmotesUtils.NO + " ou envoyez `!close` pour fermer cette file d'attente.\n\n" +
+                "Cliquez sur 🙋 ou envoyez `!ticket` pour rejoindre la file d'attente.").setColor(new Color(0x3498db));
 
         if (currentTicketMemberId > 0)
+        {
             builder.addField("Tour actuel", String.format("<@%d>", currentTicketMemberId), false);
+        }
 
         builder.addField("Personnes en attente", getStudentList(), false);
         if (queue.size() > 5)
@@ -171,16 +201,23 @@ public class TicketManager extends ListenerAdapter
     private void updateEmbed()
     {
         final Guild guild = jda.getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         try
         {
             final Message message = textChannel.retrieveMessageById(ticketManagementMessageId).complete();
             message.editMessage(getEmbed()).queue();
-        } catch (ErrorResponseException e)
+        }
+        catch (ErrorResponseException e)
         {
             sendEmbed();
         }
@@ -189,10 +226,16 @@ public class TicketManager extends ListenerAdapter
     private void sendEmbed()
     {
         final Guild guild = jda.getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         final Message message = textChannel.sendMessage(getEmbed()).complete();
         message.pin().queue();
@@ -211,12 +254,18 @@ public class TicketManager extends ListenerAdapter
                     e.getReaction().removeReaction(e.getUser()).queue();
                     break;
                 case "⏭":
-                    if (!RolesUtils.isTeacher(e.getMember())) return;
+                    if (!RolesUtils.isTeacher(e.getMember()))
+                    {
+                        return;
+                    }
                     e.getReaction().removeReaction(e.getUser()).queue();
                     takeNextTicket(e.getMember());
                     break;
                 case EmotesUtils.NO:
-                    if (!RolesUtils.isTeacher(e.getMember())) return;
+                    if (!RolesUtils.isTeacher(e.getMember()))
+                    {
+                        return;
+                    }
                     close();
                     break;
             }

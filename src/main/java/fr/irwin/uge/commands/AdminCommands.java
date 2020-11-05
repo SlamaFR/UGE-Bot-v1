@@ -21,14 +21,24 @@ public class AdminCommands
     @Command(name = "autorole")
     private void autoRole(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isAdmin(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isAdmin(member))
+        {
+            return;
+        }
 
         if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).autoRoles.containsKey(args[0]))
         {
-            MessageUtils.sendErrorMessage(textChannel, "Vous devez spécifier le nom d'un AutoRole parmi la liste suivante :\n" +
-                    "```\n" + String.join(", ", UGEBot.config().guilds.get(guild.getId()).autoRoles.keySet()) + "\n```");
+            MessageUtils.sendErrorMessage(textChannel,
+                    "Vous devez spécifier le nom d'un AutoRole parmi la liste suivante :\n" + "```\n" +
+                    String.join(", ", UGEBot.config().guilds.get(guild.getId()).autoRoles.keySet()) + "\n```");
             return;
         }
 
@@ -42,8 +52,14 @@ public class AdminCommands
     @Command(name = "traffic")
     private void traffic(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
     {
-        if (guild == null) return;
-        if (!RolesUtils.isAdmin(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!RolesUtils.isAdmin(member))
+        {
+            return;
+        }
 
         if (args.length == 0)
         {
@@ -61,14 +77,25 @@ public class AdminCommands
     @Command(name = "display")
     private void display(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isAdmin(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isAdmin(member))
+        {
+            return;
+        }
 
         if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).organizationDisplays.containsKey(args[0]))
         {
-            MessageUtils.sendErrorMessage(textChannel, "Vous devez spécifier le nom d'un Display parmi la liste suivante :\n" +
-                    "```\n" + String.join(", ", UGEBot.config().guilds.get(guild.getId()).organizationDisplays.keySet()) + "\n```");
+            MessageUtils.sendErrorMessage(textChannel,
+                    "Vous devez spécifier le nom d'un Display parmi la liste suivante :\n" + "```\n" +
+                    String.join(", ", UGEBot.config().guilds.get(guild.getId()).organizationDisplays.keySet()) +
+                    "\n```");
             return;
         }
 
@@ -87,12 +114,14 @@ public class AdminCommands
             if (Pattern.matches("\\d{18}-\\d{18}", args[1]))
             {
                 messageId = args[1].split("-")[1];
-            } else
+            }
+            else
             {
                 messageId = args[1];
             }
             feature.restore(messageId, null);
-        } else
+        }
+        else
         {
             feature.send();
         }

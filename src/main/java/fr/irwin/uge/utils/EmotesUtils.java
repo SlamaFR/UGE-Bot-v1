@@ -16,7 +16,8 @@ public class EmotesUtils
         try
         {
             return emote.getEmoji();
-        } catch (IllegalStateException ex)
+        }
+        catch (IllegalStateException ex)
         {
             return "<:" + emote.getAsReactionCode() + '>';
         }

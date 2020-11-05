@@ -12,7 +12,10 @@ public class ChannelUtils
     public static TextChannel getAnnouncementsChannel(Guild guild)
     {
         Config.Guild guildConfig = UGEBot.config().guilds.get(guild.getId());
-        if (guildConfig == null) return null;
+        if (guildConfig == null)
+        {
+            return null;
+        }
 
         String channelId = guildConfig.channels.announcements;
         return guild.getTextChannelById(channelId);
@@ -22,9 +25,15 @@ public class ChannelUtils
     public static TextChannel getCourseChannel(Guild guild, String courseId)
     {
         Config.Guild guildConfig = UGEBot.config().guilds.get(guild.getId());
-        if (guildConfig == null) return null;
+        if (guildConfig == null)
+        {
+            return null;
+        }
 
-        if (!guildConfig.channels.elearning.containsKey(courseId)) return null;
+        if (!guildConfig.channels.elearning.containsKey(courseId))
+        {
+            return null;
+        }
         return guild.getTextChannelById(guildConfig.channels.elearning.get(courseId));
     }
 }

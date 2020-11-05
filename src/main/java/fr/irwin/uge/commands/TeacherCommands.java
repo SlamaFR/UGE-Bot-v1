@@ -15,9 +15,18 @@ public class TeacherCommands
     @Command(name = "call", aliases = {"appel"})
     private void call(Guild guild, TextChannel textChannel, Member member, String[] args)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isTeacher(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isTeacher(member))
+        {
+            return;
+        }
 
         int time = 5;
         if (args.length == 1)
@@ -25,8 +34,12 @@ public class TeacherCommands
             try
             {
                 time = Integer.parseInt(args[0]);
-                if (time < 0) throw new NumberFormatException();
-            } catch (NumberFormatException e)
+                if (time < 0)
+                {
+                    throw new NumberFormatException();
+                }
+            }
+            catch (NumberFormatException e)
             {
                 MessageUtils.sendErrorMessage(textChannel, "Veuillez saisir une durée en minutes valide.");
                 return;
@@ -39,9 +52,18 @@ public class TeacherCommands
     @Command(name = "queue")
     private void queue(Guild guild, TextChannel textChannel, Member member)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isTeacher(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isTeacher(member))
+        {
+            return;
+        }
 
         if (TicketManager.hasOpenTickedManager(textChannel))
         {
@@ -55,9 +77,18 @@ public class TeacherCommands
     @Command(name = "next")
     private void next(Guild guild, TextChannel textChannel, Member member)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isTeacher(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isTeacher(member))
+        {
+            return;
+        }
 
         if (!TicketManager.hasOpenTickedManager(textChannel))
         {
@@ -71,9 +102,18 @@ public class TeacherCommands
     @Command(name = "close")
     private void close(Guild guild, TextChannel textChannel, Member member)
     {
-        if (guild == null) return;
-        if (!UGEBot.config().guilds.containsKey(guild.getId())) return;
-        if (!RolesUtils.isTeacher(member)) return;
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isTeacher(member))
+        {
+            return;
+        }
 
         if (!TicketManager.hasOpenTickedManager(textChannel))
         {

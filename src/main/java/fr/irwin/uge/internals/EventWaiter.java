@@ -32,7 +32,10 @@ public class EventWaiter implements EventListener
         if (builder.timeout > -1 && builder.unit != null)
         {
             timeoutTask = TaskScheduler.scheduleDelayed(() -> {
-                if (builder.timeoutAction != null) builder.timeoutAction.run();
+                if (builder.timeoutAction != null)
+                {
+                    builder.timeoutAction.run();
+                }
                 this.close();
             }, builder.unit.toMillis(builder.timeout));
         }
@@ -40,7 +43,10 @@ public class EventWaiter implements EventListener
 
     public void close()
     {
-        if (timeoutTask != null) timeoutTask.stop();
+        if (timeoutTask != null)
+        {
+            timeoutTask.stop();
+        }
         UGEBot.JDA().removeEventListener(this);
     }
 
@@ -51,7 +57,10 @@ public class EventWaiter implements EventListener
         if (event.getClass().equals(classType) && (condition.test(event)))
         {
             action.accept(event, this);
-            if (this.autoClose) this.close();
+            if (this.autoClose)
+            {
+                this.close();
+            }
         }
     }
 

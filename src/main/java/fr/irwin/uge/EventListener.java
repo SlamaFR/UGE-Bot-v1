@@ -33,10 +33,15 @@ public class EventListener extends ListenerAdapter
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event)
     {
         super.onGuildMessageReceived(event);
-        if (event.getAuthor().isBot()) return;
+        if (event.getAuthor().isBot())
+        {
+            return;
+        }
 
         if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag()))
+        {
             commandMap.commandUser(event.getMessage().getContentRaw().replaceFirst("!", ""), event.getMessage());
+        }
     }
 
     @Override

@@ -39,10 +39,12 @@ public class OrganizationDisplay extends MessageFeature
 
     /* Don't mind this atrocity, only for deserialization purpose. */
     @JsonCreator
-    public OrganizationDisplay(@JsonProperty("guildId") long guildId, @JsonProperty("textChannelId") long textChannelId,
-                               @JsonProperty("title") String title, @JsonProperty("fields") Map<String, Field> fields,
-                               @JsonProperty("messageId") long messageId, @JsonProperty("start") Date start,
-                               @JsonProperty("end") Date end)
+    public OrganizationDisplay(
+            @JsonProperty("guildId") long guildId,
+            @JsonProperty("textChannelId") long textChannelId,
+            @JsonProperty("title") String title,
+            @JsonProperty("fields") Map<String, Field> fields,
+            @JsonProperty("messageId") long messageId, @JsonProperty("start") Date start, @JsonProperty("end") Date end)
     {
         super(guildId, textChannelId);
         this.title = title;
@@ -58,10 +60,16 @@ public class OrganizationDisplay extends MessageFeature
         final MessageEmbed messageEmbed = getEmbed();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         Message message = textChannel.sendMessage(messageEmbed).complete();
         start(message);
@@ -73,35 +81,35 @@ public class OrganizationDisplay extends MessageFeature
     {
         messageId = m.getIdLong();
         fields.keySet().forEach(emote -> m.addReaction(emote.replace(">", "")).queue());
-        new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
-                e -> e.getMessageIdLong() == messageId && RolesUtils.isTeacher(e.getMember()),
-                (e, ew) -> {
-                    String emote;
-                    try
-                    {
-                        emote = e.getReactionEmote().getEmoji();
-                    } catch (IllegalStateException ex)
-                    {
-                        emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
-                    }
+        new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> e.getMessageIdLong() == messageId &&
+                                                                         RolesUtils.isTeacher(e.getMember()), (e, ew) -> {
+            String emote;
+            try
+            {
+                emote = e.getReactionEmote().getEmoji();
+            }
+            catch (IllegalStateException ex)
+            {
+                emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
+            }
 
-                    if (fields.containsKey(emote))
-                    {
-                        fields.get(emote).cycleState();
-                        update();
-                        e.getReaction().removeReaction(e.getUser()).queue();
-                    } else if (emote.equals("❌"))
-                    {
-                        ew.close();
-                        RedisUtils.removeFeature(e.getGuild(), messageId, this);
-                    } else if (emote.equals("🔄"))
-                    {
-                        update();
-                        e.getReaction().removeReaction(e.getUser()).queue();
-                    }
-                })
-                .autoClose(false)
-                .build();
+            if (fields.containsKey(emote))
+            {
+                fields.get(emote).cycleState();
+                update();
+                e.getReaction().removeReaction(e.getUser()).queue();
+            }
+            else if (emote.equals("❌"))
+            {
+                ew.close();
+                RedisUtils.removeFeature(e.getGuild(), messageId, this);
+            }
+            else if (emote.equals("🔄"))
+            {
+                update();
+                e.getReaction().removeReaction(e.getUser()).queue();
+            }
+        }).autoClose(false).build();
     }
 
     private void update()
@@ -110,13 +118,22 @@ public class OrganizationDisplay extends MessageFeature
         final MessageEmbed messageEmbed = getEmbed();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         final Message message = textChannel.retrieveMessageById(messageId).complete();
-        if (message == null) return;
+        if (message == null)
+        {
+            return;
+        }
         message.editMessage(messageEmbed).queue();
 
         /* Updating Redis */
@@ -126,10 +143,7 @@ public class OrganizationDisplay extends MessageFeature
     private MessageEmbed getEmbed()
     {
 
-        EmbedBuilder builder = new EmbedBuilder()
-                .setTitle(title)
-                .setDescription(String.format("Semaine du **%s** au **%s**",
-                        DateUtils.formatDate(start), DateUtils.formatDate(end)));
+        EmbedBuilder builder = new EmbedBuilder().setTitle(title).setDescription(String.format("Semaine du **%s** au **%s**", DateUtils.formatDate(start), DateUtils.formatDate(end)));
 
         for (Map.Entry<String, Field> entry : fields.entrySet())
         {
@@ -151,10 +165,7 @@ public class OrganizationDisplay extends MessageFeature
 
     public enum State
     {
-        UNKNOWN("*Information à venir*"),
-        ON_SITE("Présentiel"),
-        HYBRID("Hybride"),
-        REMOTE("À distance");
+        UNKNOWN("*Information à venir*"), ON_SITE("Présentiel"), HYBRID("Hybride"), REMOTE("À distance");
 
         private final String value;
 

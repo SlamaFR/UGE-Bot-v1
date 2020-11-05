@@ -12,7 +12,8 @@ import java.util.function.Function;
  */
 public final class TaskScheduler implements Runnable
 {
-    private static final Function<String, ThreadFactory> FACTORY = name -> new ThreadFactoryBuilder().setNameFormat("[" + name + "-Pool-%d] ").build();
+    private static final Function<String, ThreadFactory> FACTORY = name -> new ThreadFactoryBuilder().setNameFormat(
+            "[" + name + "-Pool-%d] ").build();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool(FACTORY.apply("TaskScheduler"));
 
     private final Runnable runnable;
@@ -69,7 +70,9 @@ public final class TaskScheduler implements Runnable
     {
         initWait();
         if (!this.repeating && !stop)
+        {
             runnable.run();
+        }
 
         while (repeating && !stop)
         {
@@ -80,7 +83,10 @@ public final class TaskScheduler implements Runnable
 
     private void initWait()
     {
-        if (initialDelay > 0) waitNow(initialDelay);
+        if (initialDelay > 0)
+        {
+            waitNow(initialDelay);
+        }
     }
 
     private void waitNow(long millis)
@@ -88,7 +94,8 @@ public final class TaskScheduler implements Runnable
         try
         {
             Thread.sleep(millis);
-        } catch (InterruptedException e)
+        }
+        catch (InterruptedException e)
         {
             e.printStackTrace();
         }

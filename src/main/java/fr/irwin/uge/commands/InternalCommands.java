@@ -23,21 +23,30 @@ public class InternalCommands
     @Command(name = "die")
     private void die(Message message)
     {
-        if (message != null) return;
+        if (message != null)
+        {
+            return;
+        }
         UGEBot.instance().setRunning(false);
     }
 
     @Command(name = "reload")
     private void reload(Message message)
     {
-        if (message != null) return;
+        if (message != null)
+        {
+            return;
+        }
         UGEBot.instance().reloadConfig();
     }
 
     @Command(name = "say")
     private void say(Message message, JDA jda, String[] args)
     {
-        if (message != null) return;
+        if (message != null)
+        {
+            return;
+        }
 
         if (args.length < 1)
         {
@@ -134,7 +143,10 @@ public class InternalCommands
     @Command(name = "rename")
     private void rename(Message message, JDA jda, String[] args)
     {
-        if (message != null) return;
+        if (message != null)
+        {
+            return;
+        }
 
         if (args.length < 1)
         {
@@ -162,14 +174,23 @@ public class InternalCommands
         LOGGER.info("Checking members...");
         for (Member m : guild.loadMembers().get())
         {
-            if (m.getUser().isBot()) continue;
-            if (StringUtils.isCapitalized(m.getEffectiveName())) continue;
+            if (m.getUser().isBot())
+            {
+                continue;
+            }
+            if (StringUtils.isCapitalized(m.getEffectiveName()))
+            {
+                continue;
+            }
 
             String nick = m.getEffectiveName().replaceAll("[._]", " ");
 
             if (m.getEffectiveName().equals(StringUtils.capitalizeString(nick)))
             {
-                if (ignored.length() > 1) ignored.append(", ");
+                if (ignored.length() > 1)
+                {
+                    ignored.append(", ");
+                }
                 ignored.append(m.getEffectiveName());
                 continue;
             }
@@ -177,11 +198,18 @@ public class InternalCommands
             try
             {
                 m.modifyNickname(StringUtils.capitalizeString(nick)).complete();
-                if (renamed.length() > 1) renamed.append(", ");
+                if (renamed.length() > 1)
+                {
+                    renamed.append(", ");
+                }
                 renamed.append(m.getEffectiveName());
-            } catch (HierarchyException e)
+            }
+            catch (HierarchyException e)
             {
-                if (ignored.length() > 1) ignored.append(", ");
+                if (ignored.length() > 1)
+                {
+                    ignored.append(", ");
+                }
                 ignored.append(m.getEffectiveName());
             }
         }
@@ -189,10 +217,19 @@ public class InternalCommands
         LOGGER.info("Verifying renaming...");
         for (Member m : guild.loadMembers().get())
         {
-            if (m.getUser().isBot()) continue;
-            if (StringUtils.isCapitalized(m.getEffectiveName())) continue;
+            if (m.getUser().isBot())
+            {
+                continue;
+            }
+            if (StringUtils.isCapitalized(m.getEffectiveName()))
+            {
+                continue;
+            }
 
-            if (declined.length() > 1) declined.append(", ");
+            if (declined.length() > 1)
+            {
+                declined.append(", ");
+            }
             declined.append(m.getEffectiveName());
         }
 

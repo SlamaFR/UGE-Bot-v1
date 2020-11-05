@@ -46,10 +46,13 @@ public class AutoRole extends MessageFeature
 
     /* Don't mind this atrocity, only for deserialization purpose. */
     @JsonCreator
-    public AutoRole(@JsonProperty("guildId") long guildId, @JsonProperty("textChannelId") long textChannelId,
-                    @JsonProperty("title") String title, @JsonProperty("description") String description,
-                    @JsonProperty("roles") Map<String, String> roles, @JsonProperty("rolesList") boolean rolesList,
-                    @JsonProperty("maxRoles") int maxRoles)
+    public AutoRole(
+            @JsonProperty("guildId") long guildId,
+            @JsonProperty("textChannelId") long textChannelId,
+            @JsonProperty("title") String title,
+            @JsonProperty("description") String description,
+            @JsonProperty("roles") Map<String, String> roles,
+            @JsonProperty("rolesList") boolean rolesList, @JsonProperty("maxRoles") int maxRoles)
     {
         super(guildId, textChannelId);
         this.title = title;
@@ -66,13 +69,22 @@ public class AutoRole extends MessageFeature
     public void send()
     {
         final MessageEmbed messageEmbed = getMessageEmbed();
-        if (messageEmbed == null) return;
+        if (messageEmbed == null)
+        {
+            return;
+        }
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null) return;
+        if (guild == null)
+        {
+            return;
+        }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null) return;
+        if (textChannel == null)
+        {
+            return;
+        }
 
         final Message message = textChannel.sendMessage(messageEmbed).complete();
         start(message);
@@ -83,36 +95,37 @@ public class AutoRole extends MessageFeature
     protected void start(Message m)
     {
         roles.keySet().stream().sorted().map(e -> e.replace(">", "")).forEach(e -> m.addReaction(e).queue());
-        new EventWaiter.Builder(GuildMessageReactionAddEvent.class,
-                e -> e.getMessageIdLong() == m.getIdLong() && !e.getUser().isBot() &&
-                        (RolesUtils.commonRoles(e.getMember().getRoles(), rolesCollection) < maxRoles || RolesUtils.isAdmin(e.getMember())),
-                (e, ew) -> {
-                    String emote;
-                    try
-                    {
-                        emote = e.getReactionEmote().getEmoji();
-                    } catch (IllegalStateException ex)
-                    {
-                        emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
-                    }
-                    if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember()))
-                    {
-                        ew.close();
-                        RedisUtils.removeFeature(e.getGuild(), m.getIdLong(), this);
-                        return;
-                    }
-                    Role role = m.getGuild().getRoleById(roles.get(emote));
-                    if (role != null)
-                    {
-                        m.getGuild().addRoleToMember(e.getMember(), role).complete();
-                    } else
-                    {
-                        ew.close();
-                        m.delete().queue();
-                    }
-                })
-                .autoClose(false)
-                .build();
+        new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> e.getMessageIdLong() == m.getIdLong() &&
+                                                                         !e.getUser().isBot() &&
+                                                                         (RolesUtils.commonRoles(e.getMember().getRoles(), rolesCollection) <
+                                                                          maxRoles ||
+                                                                          RolesUtils.isAdmin(e.getMember())), (e, ew) -> {
+            String emote;
+            try
+            {
+                emote = e.getReactionEmote().getEmoji();
+            }
+            catch (IllegalStateException ex)
+            {
+                emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
+            }
+            if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember()))
+            {
+                ew.close();
+                RedisUtils.removeFeature(e.getGuild(), m.getIdLong(), this);
+                return;
+            }
+            Role role = m.getGuild().getRoleById(roles.get(emote));
+            if (role != null)
+            {
+                m.getGuild().addRoleToMember(e.getMember(), role).complete();
+            }
+            else
+            {
+                ew.close();
+                m.delete().queue();
+            }
+        }).autoClose(false).build();
     }
 
     private void fillRolesCollection()
@@ -131,11 +144,12 @@ public class AutoRole extends MessageFeature
     private MessageEmbed getMessageEmbed()
     {
         final String roleList = formatRoleList();
-        if (roleList == null) return null;
+        if (roleList == null)
+        {
+            return null;
+        }
 
-        final EmbedBuilder builder = new EmbedBuilder()
-                .setTitle(title)
-                .setDescription(description);
+        final EmbedBuilder builder = new EmbedBuilder().setTitle(title).setDescription(description);
         if (rolesList)
         {
             builder.addField("Liste des rôles", roleList, false);
@@ -153,7 +167,10 @@ public class AutoRole extends MessageFeature
             {
                 return null;
             }
-            if (stringBuilder.length() > 0) stringBuilder.append("\n\n");
+            if (stringBuilder.length() > 0)
+            {
+                stringBuilder.append("\n\n");
+            }
             stringBuilder.append(String.format("%s : `%s`", entry.getKey(), role.getName()));
         }
         return stringBuilder.toString();

@@ -14,7 +14,10 @@ public class StringUtils
 
     public static String capitalizeString(String string)
     {
-        if (string == null) return null;
+        if (string == null)
+        {
+            return null;
+        }
         char[] chars = string.toLowerCase().toCharArray();
         boolean found = false;
         for (int i = 0; i < chars.length; i++)
@@ -23,10 +26,12 @@ public class StringUtils
             {
                 chars[i] = Character.toUpperCase(chars[i]);
                 found = true;
-            } else if (Character.isWhitespace(chars[i]) || chars[i] == '-')
+            }
+            else if (Character.isWhitespace(chars[i]) || chars[i] == '-')
             {
                 found = false;
-            } else if (Character.isLetter(chars[i]))
+            }
+            else if (Character.isLetter(chars[i]))
             {
                 chars[i] = Character.toLowerCase(chars[i]);
             }
