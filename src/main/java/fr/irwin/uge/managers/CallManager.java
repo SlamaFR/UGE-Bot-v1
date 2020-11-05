@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class CallManager
 {
     public static final String CALL_PRESENT_EMOTE = "🙋";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallManager.class);
 
     private final long guildId;
     private final long textChannelId;
@@ -41,15 +44,21 @@ public class CallManager
         this.presents = new HashSet<>();
 
         Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy@HH-mm");
-        this.resultFile = new File(String.format("%s_#%s_%s.txt", member.getEffectiveName().replace(' ', '_'), textChannel.getName(), df.format(date)));
+        SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
+        this.resultFile = new File(
+                String.format("%s_#%s_%s.txt", member.getEffectiveName().replace(' ', '_'), textChannel.getName(),
+                        df.format(date)));
     }
 
     private long sendMessage(String teacherName)
     {
-        MessageEmbed embed = new EmbedBuilder().setTitle("Appel demandé par " +
-                                                         teacherName).setDescription(String.format("Vous avez %d minute%s pour cliquer sur %s afin confirmer votre présence.", timeout, (
-                timeout > 1 ? "s" : ""), CALL_PRESENT_EMOTE)).setColor(new Color(0x2ecc71)).build();
+        MessageEmbed embed = new EmbedBuilder()
+                .setTitle("Appel demandé par " + teacherName)
+                .setDescription(
+                        String.format("Vous avez %d minute%s pour cliquer sur %s afin de confirmer votre présence.",
+                                timeout, (timeout > 1 ? "s" : ""), CALL_PRESENT_EMOTE))
+                .setColor(new Color(0x2ecc71))
+                .build();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
         if (guild == null)
@@ -71,25 +80,34 @@ public class CallManager
             boolean emoteCheck = EmotesUtils.getEmote(e.getReactionEmote()).equals(CALL_PRESENT_EMOTE);
             boolean userCheck = !e.getUser().isBot();
             return messageCheck && emoteCheck && userCheck;
-        }, (e, ew) -> presents.add(e.getMember().getEffectiveName())).autoClose(false).timeout(timeout, TimeUnit.MINUTES).timeoutAction(() -> close(teacherName)).build();
+        }, (e, ew) -> presents.add(e.getMember().getEffectiveName()))
+                .autoClose(false)
+                .timeout(timeout, TimeUnit.MINUTES)
+                .timeoutAction(() -> close(teacherName))
+                .build();
 
         return message.getIdLong();
     }
 
     private void close(String teacherName)
     {
-        MessageEmbed embed = new EmbedBuilder().setTitle("Appel demandé par " +
-                                                         teacherName).setDescription(String.format("L'appel est terminé. %d personnes étaient présentes.", presents.size())).setColor(new Color(0xe67e22)).build();
+        MessageEmbed embed = new EmbedBuilder()
+                .setTitle("Appel demandé par " + teacherName)
+                .setDescription(String.format("L'appel est terminé. %d personnes étaient présentes.", presents.size()))
+                .setColor(new Color(0xe67e22))
+                .build();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
         if (guild == null)
         {
+            LOGGER.warn("Lost guild!");
             return;
         }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
         if (textChannel == null)
         {
+            LOGGER.warn("Lost text channel!");
             return;
         }
 
@@ -101,12 +119,14 @@ public class CallManager
         }
         catch (ErrorResponseException e)
         {
+            LOGGER.warn("Couldn't edit message!");
             return;
         }
 
-        final Member member = guild.getMemberById(teacherUserId);
+        final Member member = guild.retrieveMemberById(teacherUserId).complete();
         if (member == null)
         {
+            LOGGER.warn("Lost member!");
             return;
         }
 
@@ -115,14 +135,19 @@ public class CallManager
             fillFile(teacherName, textChannel.getName());
 
             member.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessage(
-                        "Résultat de l'appel dans #" + textChannel.getName()).addFile(resultFile).queue();
+                privateChannel
+                        .sendMessage("Résultat de l'appel dans #" + textChannel.getName())
+                        .addFile(resultFile)
+                        .queue();
             });
         }
         catch (IOException e)
         {
-            textChannel.sendMessage("Une erreur est survenue lors de la fin de l'appel. Contacter votre administrateur.").queue();
+            textChannel
+                    .sendMessage("Une erreur est survenue lors de la fin de l'appel. Contactez votre administrateur.")
+                    .queue();
             e.printStackTrace();
+            LOGGER.error("IO error!");
         }
     }
 
@@ -135,7 +160,8 @@ public class CallManager
         Date date = calendar.getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy à HH:mm");
 
-        fw.write(String.format("Appel effectué le %s par %s dans le salon #%s.\n\n%d personnes présentes :\n", df.format(date), teacherName, channelName, presents.size()));
+        fw.write(String.format("Appel effectué le %s par %s dans le salon #%s.\n\n%d personnes présentes :\n",
+                df.format(date), teacherName, channelName, presents.size()));
 
         for (String name : presents)
         {
