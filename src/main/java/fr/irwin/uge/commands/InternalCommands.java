@@ -83,17 +83,9 @@ public class InternalCommands
     @Command(name = "announce")
     private void announce(Message message, JDA jda, String[] args)
     {
-        if (message != null) return;
-
-        if (args.length < 1)
+        if (message != null || args.length < 1)
         {
             LOGGER.error("Must provide guild or \"all\"!");
-            return;
-        }
-
-        if (!UGEBot.config().guilds.containsKey(args[0]))
-        {
-            LOGGER.error("This guild is not registered in config!");
             return;
         }
 
@@ -101,8 +93,14 @@ public class InternalCommands
         if (args[0].equals("all"))
         {
             guildsId = jda.getGuilds().stream().map(ISnowflake::getId).collect(Collectors.toSet());
-        } else
+        }
+        else
         {
+            if (!UGEBot.config().guilds.containsKey(args[0]))
+            {
+                LOGGER.error("This guild is not registered in config!");
+                return;
+            }
             guildsId = new HashSet<>(Collections.singletonList(args[0]));
         }
 
@@ -125,7 +123,7 @@ public class InternalCommands
             TextChannel textChannel = ChannelUtils.getAnnouncementsChannel(guild);
             if (textChannel == null)
             {
-                LOGGER.error("Couldn't find announcements text channel on guild {}!", guildId);
+                LOGGER.warn("Couldn't find announcements text channel on guild {}!", guildId);
                 continue;
             }
 
