@@ -84,7 +84,7 @@ public class PublicCommands
                 }
                 else
                 {
-                    table.nextCell().setText(' ' + col + ' ');
+                    table.nextCell().setText(' ' + col.replace("`", "") + ' ');
                 }
             }
         }
