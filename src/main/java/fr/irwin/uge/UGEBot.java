@@ -33,15 +33,19 @@ public class UGEBot implements Runnable
     private Config config;
     private boolean running;
 
-    public UGEBot() throws LoginException, JsonProcessingException
+    public UGEBot(String configPath) throws LoginException, JsonProcessingException
     {
         instance = this;
         commandMap = new CommandMap();
-        config = Config.parseFile("./config.json");
+        config = Config.parseFile(configPath);
 
         Redis.instance();
 
-        jda = JDABuilder.createDefault(config.token).addEventListeners(new EventListener(commandMap)).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
+        jda = JDABuilder
+                .createDefault(config.token)
+                .addEventListeners(new EventListener(commandMap))
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .build();
         try
         {
             jda.awaitReady();
@@ -88,9 +92,16 @@ public class UGEBot implements Runnable
 
     public static void main(String[] args)
     {
+        String configPath = "./config.json";
+
+        if (args.length > 0)
+        {
+            configPath = args[0];
+        }
+
         try
         {
-            new Thread(new UGEBot()).start();
+            new Thread(new UGEBot(configPath)).start();
         }
         catch (LoginException e)
         {
