@@ -48,13 +48,14 @@ public class StringUtils
      * Code from Jan Goyvaerts on StackOverflow
      * https://stackoverflow.com/questions/366202
      *
-     * Regex to ignore escaped quotes from Kobi on StackOverflow
+     * Regex to ignore escaped quotes from Kobi on StackOverflow + self work
      * https://stackoverflow.com/questions/4031900
      */
     public static List<String> splitArgs(String string)
     {
         List<String> matchList = new ArrayList<>();
-        Pattern regex = Pattern.compile("[^\\s\"]+|\"(?:\\\\\"|[^\"])*\"");
+        /* Pattern regex = Pattern.compile("[^\\s\"]+|\"(?:\\\\\"|[^\"])*\"") */
+        Pattern regex = Pattern.compile("(?:\\\\\"|[^\\s\"])+|\"(?:\\\\\"|[^\"])*\"");
         Matcher regexMatcher = regex.matcher(string);
         while (regexMatcher.find())
         {
