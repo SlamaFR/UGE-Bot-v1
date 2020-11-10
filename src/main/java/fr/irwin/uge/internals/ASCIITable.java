@@ -6,9 +6,12 @@ import java.util.List;
 
 public class ASCIITable
 {
-    private static final char HORIZONTAL = '-';
-    private static final char VERTICAL = '|';
-    private static final char INTERSECT = '+';
+    /**
+     * Represents chars composing the ASCII table [bottom][up][left][right].
+     */
+    private static final char[][][][] CHARS = {{{{' ', '╶'}, {'╴', '─'}}, {{'╵', '└'}, {'┘', '┴'}}}, {{{'╷', '┌'}, {'┐', '┬'}}, {{'│', '├'}, {'┤', '┼'}}}};
+    private static final char HORIZONTAL = CHARS[0][0][1][1];
+    private static final char VERTICAL = CHARS[1][1][0][0];
 
     /**
      * Represents a list of rows, themselves representing a list of cells.
@@ -140,14 +143,6 @@ public class ASCIITable
     }
 
     /**
-     * @return whether every cell around [{@code row}, {@code col}] is empty.
-     */
-    private boolean emptyAround(int row, int col)
-    {
-        return empty(row, col) && empty(row, col - 1) && empty(row - 1, col) && empty(row - 1, col - 1);
-    }
-
-    /**
      * @return returns the upper horizontal line of the {@code n}th row.
      */
     private String getHorizontalLine(int n)
@@ -155,7 +150,7 @@ public class ASCIITable
         StringBuilder builder = new StringBuilder();
         for (int col = 0; col < this.col; col++)
         {
-            builder.append(!emptyAround(n, col) ? INTERSECT : ' ');
+            builder.append(getIntersect(n, col));
             if (!empty(n - 1, col) || !empty(n, col))
             {
                 builder.append(String.valueOf(HORIZONTAL).repeat(colWidths.get(col)));
@@ -165,8 +160,17 @@ public class ASCIITable
                 builder.append(String.valueOf(' ').repeat(colWidths.get(col)));
             }
         }
-        builder.append((!empty(n - 1, col - 1) || !empty(n, col - 1)) ? INTERSECT : ' ');
+        builder.append(getIntersect(n, this.col));
         return builder.toString();
+    }
+
+    private char getIntersect(int row, int col)
+    {
+        int up = empty(row - 1, col - 1) && empty(row - 1, col) ? 0 : 1;
+        int bottom = empty(row, col - 1) && empty(row, col) ? 0 : 1;
+        int left = empty(row - 1, col - 1) && empty(row, col - 1) ? 0 : 1;
+        int right = empty(row - 1, col) && empty(row, col) ? 0 : 1;
+        return CHARS[bottom][up][left][right];
     }
 
     @Override
