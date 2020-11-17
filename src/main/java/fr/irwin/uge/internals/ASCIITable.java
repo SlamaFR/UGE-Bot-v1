@@ -76,10 +76,15 @@ public class ASCIITable
      */
     public ASCIITable setText(String text)
     {
+        if (!" ".equals(text))
+        {
+            text = ' ' + text + ' ';
+        }
+
         table.get(currentRow).set(currentCol, text);
         if (text.length() > colWidths.get(currentCol))
         {
-            colWidths.set(currentCol, text.length());
+            colWidths.set(currentCol, text.length() - (text.split("\\\\§", -1).length - 1));
         }
         return this;
     }
@@ -139,7 +144,7 @@ public class ASCIITable
         {
             return true;
         }
-        return table.get(row).get(col).trim().isEmpty();
+        return table.get(row).get(col).trim().isEmpty();// || "§".equals(table.get(row).get(col));
     }
 
     /**
@@ -164,6 +169,9 @@ public class ASCIITable
         return builder.toString();
     }
 
+    /**
+     * @return the char at the intersection of the north west edge of the cell at [{@code row}, {@code col}].
+     */
     private char getIntersect(int row, int col)
     {
         int up = empty(row - 1, col - 1) && empty(row - 1, col) ? 0 : 1;
@@ -184,7 +192,7 @@ public class ASCIITable
             builder.append('\n');
             for (int col = 0; col < this.col; col++)
             {
-                String cellValue = table.get(row).get(col).replace('§', ' ');
+                String cellValue = table.get(row).get(col).replaceAll("(?<!\\\\)§", "").replaceAll("\\\\§", "§");
                 builder.append((!empty(row, col) || !empty(row, col - 1)) ? VERTICAL : ' ');
                 builder.append(cellValue).append(String.valueOf(' ').repeat(colWidths.get(col) - cellValue.length()));
             }

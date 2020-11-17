@@ -60,25 +60,35 @@ public class PublicCommands
                             .setDescription(
                                     "Cette commande permet de générer rapidement des tableaux avec des caractères ASCII.")
                             .addField("Utilisation", "`!table <Ligne 1> <Ligne 2> ... <Ligne N>`", false)
-                            .addField("Syntaxe", "Une ligne est divisée en colonnes par le caractère `;`. " +
-                                                 "Si votre ligne contient un ou plusieurs espace, il faut l'encadrer avec des " +
-                                                 "guillemets pour éviter des comportements inattendus.\n" +
-                                                 "Pour dessiner une case vide avec les bordures, il faut écrire un et un seul espace.",
-                                    false)
-                            .addField("Exemple 1",
-                                    "`!table \";Colonne 1;Colonne 2\" \"Ligne 1;Val 1;Val 2\" ou;comme;ceci`\n" +
-                                    "```\n" + "          ┌───────────┬───────────┐\n" +
-                                    "          │ Colonne 1 │ Colonne 2 │\n" + "┌─────────┼───────────┼───────────┤\n" +
-                                    "│ Ligne 1 │ Val 1     │ Val 2     │\n" + "├─────────┼───────────┼───────────┤\n" +
-                                    "│ ou      │ comme     │ ceci      │\n" + "└─────────┴───────────┴───────────┘\n" +
-                                    "```", false)
-                            .addField("Exemple 2",
-                                    "`!table \" ;Colonne 1;Colonne 2\" \"Ligne 1;Val 1;Val 2\" ou;comme;ceci`\n" +
-                                    "```\n" + "┌─────────┬───────────┬───────────┐\n" +
-                                    "│         │ Colonne 1 │ Colonne 2 │\n" + "├─────────┼───────────┼───────────┤\n" +
-                                    "│ Ligne 1 │ Val 1     │ Val 2     │\n" + "├─────────┼───────────┼───────────┤\n" +
-                                    "│ ou      │ comme     │ ceci      │\n" + "└─────────┴───────────┴───────────┘\n" +
-                                    "```", false)
+                            .addField("Syntaxe", """
+                                                 Une ligne est divisée en colonnes par le caractère `;`.
+                                                 Si une ligne contient un ou plusieurs espaces, il faut l'encadrer avec des guillemets pour éviter des comportements inattendus.
+                                                 Pour dessiner une case vide, sans les bordures, la cellule ne doit contenir que des espaces.
+                                                 """, false)
+                            .addField("Exemple 1", """
+                                                             `!table ";Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
+                                                             ```
+                                                   ┌─────────┬───────────┬───────────┐
+                                                   │         │ Colonne 1 │ Colonne 2 │
+                                                   ├─────────┼───────────┼───────────┤
+                                                   │ Ligne 1 │ Val 1     │ Val 2     │
+                                                   ├─────────┼───────────┼───────────┤
+                                                   │ ou      │ comme     │ ceci      │
+                                                   └─────────┴───────────┴───────────┘
+                                                   ```
+                                                   """, false)
+                            .addField("Exemple 2", """
+                                                             `!table " ;Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
+                                                             ```
+                                                             ┌───────────┬───────────┐
+                                                             │ Colonne 1 │ Colonne 2 │
+                                                   ┌─────────┼───────────┼───────────┤
+                                                   │ Ligne 1 │ Val 1     │ Val 2     │
+                                                   ├─────────┼───────────┼───────────┤
+                                                   │ ou      │ comme     │ ceci      │
+                                                   └─────────┴───────────┴───────────┘
+                                                   ```
+                                                   """, false)
                             .build())
                     .queue();
             return;
@@ -90,13 +100,13 @@ public class PublicCommands
             table.nextRow();
             for (String col : row.split(";", -1))
             {
-                if (col.equalsIgnoreCase(" "))
+                if (col.isEmpty())
                 {
                     table.nextCell().blank();
                 }
                 else
                 {
-                    table.nextCell().setText(' ' + col.replace("`", "") + ' ');
+                    table.nextCell().setText(col.replace("`", ""));
                 }
             }
         }

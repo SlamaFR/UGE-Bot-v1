@@ -54,12 +54,11 @@ public class StringUtils
     public static List<String> splitArgs(String string)
     {
         List<String> matchList = new ArrayList<>();
-        /* Pattern regex = Pattern.compile("[^\\s\"]+|\"(?:\\\\\"|[^\"])*\"") */
         Pattern regex = Pattern.compile("(?:\\\\\"|[^\\s\"])+|\"(?:\\\\\"|[^\"])*\"");
         Matcher regexMatcher = regex.matcher(string);
         while (regexMatcher.find())
         {
-            matchList.add(regexMatcher.group(0).replaceAll("(?<!\\\\)\"", "").replaceAll("\\\\", ""));
+            matchList.add(regexMatcher.group(0).replaceAll("(?<!\\\\)\"", "").replaceAll("\\\\\"", "\""));
         }
         return matchList;
     }
