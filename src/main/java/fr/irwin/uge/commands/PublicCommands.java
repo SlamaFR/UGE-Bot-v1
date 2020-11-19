@@ -117,7 +117,15 @@ public class PublicCommands
         }
         else
         {
-            textChannel.sendMessage("```\n" + table + "\n```").queue();
+            String string = table.toString();
+            if (string.length() > 2000)
+            {
+                MessageUtils.sendErrorMessage(textChannel, "Le tableau est trop grand.");
+            }
+            else
+            {
+                textChannel.sendMessage("```\n" + table + "\n```").queue();
+            }
         }
     }
 }
