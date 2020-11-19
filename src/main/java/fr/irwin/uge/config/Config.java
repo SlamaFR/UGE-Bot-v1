@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ public class Config
         final String jsonSource;
         try
         {
-            jsonSource = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            jsonSource = Files.readString(Paths.get(path));
             LOGGER.info("Successfully loaded config!");
         }
         catch (IOException e)
@@ -74,6 +73,8 @@ public class Config
         public Map<String, AutoRole> autoRoles = new HashMap<>();
         @JsonProperty
         public Map<String, OrganizationDisplay> organizationDisplays = new HashMap<>();
+        @JsonProperty
+        public String[] disabledCommands = new String[]{};
 
         public static class Roles
         {

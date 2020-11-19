@@ -93,6 +93,16 @@ public class CommandMap
         BotCommand cmd = (BotCommand) object[0];
         try
         {
+            Guild guild = message.getGuild();
+            if (UGEBot.config().guilds.containsKey(guild.getId()))
+            {
+                if (Arrays
+                        .stream(UGEBot.config().guilds.get(guild.getId()).disabledCommands)
+                        .anyMatch(s -> s.equals(cmd.getName())))
+                {
+                    return;
+                }
+            }
             execute(cmd, command, (String[]) object[1], message);
         }
         catch (Exception e)
