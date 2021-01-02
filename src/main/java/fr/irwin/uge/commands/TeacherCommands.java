@@ -6,6 +6,7 @@ import fr.irwin.uge.managers.CallManager;
 import fr.irwin.uge.managers.TicketManager;
 import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.RolesUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -122,6 +123,31 @@ public class TeacherCommands
         }
 
         TicketManager.getTicketManager(textChannel).close();
+    }
+
+    @Command(name = "poll")
+    private void poll(Guild guild, TextChannel textChannel, Member member, String[] args)
+    {
+        if (guild == null)
+        {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId()))
+        {
+            return;
+        }
+        if (!RolesUtils.isTeacher(member))
+        {
+            return;
+        }
+
+        textChannel.sendMessage(
+                new EmbedBuilder().setTitle(String.format("Sondage demandé par %s", member.getEffectiveName()))
+                        .setDescription(String.join(" ", args)).setColor(0x9b59b6).build()).queue(message -> {
+            message.addReaction("\uD83D\uDC4D").queue();
+            message.addReaction("\uD83E\uDD74").queue();
+            message.addReaction("\uD83D\uDC4E").queue();
+        });
     }
 }
 

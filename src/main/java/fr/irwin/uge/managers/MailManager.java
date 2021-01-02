@@ -157,14 +157,17 @@ public class MailManager
         LOGGER.info("[MAIL] Sender name: {}", senderName);
         LOGGER.info("[MAIL] Course name: {}", courseName);
         LOGGER.info("[MAIL] Sending e-Learning announcement!");
-        textChannel.sendMessage(new EmbedBuilder().setTitle(MoreObjects.firstNonNull(courseName, "Annonce")).setAuthor(senderName, null, avatarUrl).setDescription(content).setColor(color).setFooter("Via e-Learning").build()).queue();
+        textChannel.sendMessage(new EmbedBuilder().setTitle(MoreObjects.firstNonNull(courseName, "Annonce"))
+                .setAuthor(senderName, null, avatarUrl).setDescription(content).setColor(color)
+                .setFooter("Via e-Learning").build()).queue();
     }
 
     private Properties getProperties()
     {
         Properties properties = new Properties();
         properties.put(String.format("mail.%s.host", UGEBot.config().mail.protocol), UGEBot.config().mail.host);
-        properties.put(String.format("mail.%s.port", UGEBot.config().mail.protocol), String.valueOf(UGEBot.config().mail.port));
+        properties.put(String.format("mail.%s.port", UGEBot.config().mail.protocol),
+                String.valueOf(UGEBot.config().mail.port));
         properties.put(String.format("mail.%s.starttls.enable", UGEBot.config().mail.protocol), "true");
         return properties;
     }
