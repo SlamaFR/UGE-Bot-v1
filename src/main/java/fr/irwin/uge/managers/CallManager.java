@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +21,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class CallManager
-{
+public class CallManager {
     public static final String CALL_PRESENT_EMOTE = "🙋";
     private static final Logger LOGGER = LoggerFactory.getLogger(CallManager.class);
 
@@ -32,16 +33,29 @@ public class CallManager
     private final long teacherUserId;
     private final int timeout;
     private final Set<String> presents;
+    private final Set<String> absents;
+    private final int objective;
     private final File resultFile;
 
-    public CallManager(TextChannel textChannel, Member member, int timeout)
-    {
+    public CallManager(TextChannel textChannel, @Nullable Role role, Member member, int timeout) {
         this.guildId = textChannel.getGuild().getIdLong();
         this.textChannelId = textChannel.getIdLong();
         this.teacherUserId = member.getIdLong();
         this.timeout = timeout;
         this.messageId = sendMessage(member.getEffectiveName());
         this.presents = new HashSet<>();
+
+        if (role != null) {
+            this.absents = textChannel.getGuild()
+                    .getMembersWithRoles(role)
+                    .stream()
+                    .map(Member::getEffectiveName)
+                    .collect(Collectors.toSet());
+            this.objective = absents.size();
+        } else {
+            this.absents = null;
+            this.objective = -1;
+        }
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
@@ -50,8 +64,11 @@ public class CallManager
                         df.format(date)));
     }
 
-    private long sendMessage(String teacherName)
-    {
+    public CallManager(TextChannel textChannel, Member member, int timeout) {
+        this(textChannel, null, member, timeout);
+    }
+
+    private long sendMessage(String teacherName) {
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Appel demandé par " + teacherName)
                 .setDescription(
@@ -61,14 +78,12 @@ public class CallManager
                 .build();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null)
-        {
+        if (guild == null) {
             return 0L;
         }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null)
-        {
+        if (textChannel == null) {
             return 0L;
         }
 
@@ -80,8 +95,12 @@ public class CallManager
             boolean emoteCheck = EmotesUtils.getEmote(e.getReactionEmote()).equals(CALL_PRESENT_EMOTE);
             boolean userCheck = !e.getUser().isBot();
             return messageCheck && emoteCheck && userCheck;
-        }, (e, ew) -> presents.add(e.getMember().getEffectiveName()))
-                .autoClose(false)
+        }, (e, ew) -> {
+            presents.add(e.getMember().getEffectiveName());
+            if (absents != null) {
+                absents.remove(e.getMember().getEffectiveName());
+            }
+        }).autoClose(false)
                 .timeout(timeout, TimeUnit.MINUTES)
                 .timeoutAction(() -> close(teacherName))
                 .build();
@@ -89,49 +108,41 @@ public class CallManager
         return message.getIdLong();
     }
 
-    private void close(String teacherName)
-    {
+    private void close(String teacherName) {
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Appel demandé par " + teacherName)
-                .setDescription(String.format("L'appel est terminé. %d personnes étaient présentes.", presents.size()))
+                .setDescription(getSummary())
                 .setColor(new Color(0xe67e22))
                 .build();
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null)
-        {
+        if (guild == null) {
             LOGGER.warn("Lost guild!");
             return;
         }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null)
-        {
+        if (textChannel == null) {
             LOGGER.warn("Lost text channel!");
             return;
         }
 
-        try
-        {
+        try {
             final Message message = textChannel.retrieveMessageById(messageId).complete();
             message.editMessage(embed).queue();
             message.removeReaction(CALL_PRESENT_EMOTE).queue();
-        }
-        catch (ErrorResponseException e)
-        {
+        } catch (ErrorResponseException e) {
             LOGGER.warn("Couldn't edit message!");
             return;
         }
 
         final Member member = guild.retrieveMemberById(teacherUserId).complete();
-        if (member == null)
-        {
+        if (member == null) {
             LOGGER.warn("Lost member!");
             return;
         }
 
-        try
-        {
+        try {
             fillFile(teacherName, textChannel.getName());
 
             member.getUser().openPrivateChannel().queue(privateChannel -> {
@@ -140,9 +151,7 @@ public class CallManager
                         .addFile(resultFile)
                         .queue();
             });
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             textChannel
                     .sendMessage("Une erreur est survenue lors de la fin de l'appel. Contactez votre administrateur.")
                     .queue();
@@ -151,8 +160,7 @@ public class CallManager
         }
     }
 
-    private void fillFile(String teacherName, String channelName) throws IOException
-    {
+    private void fillFile(String teacherName, String channelName) throws IOException {
         FileWriter fw = new FileWriter(resultFile);
 
         Calendar calendar = Calendar.getInstance();
@@ -163,12 +171,29 @@ public class CallManager
         fw.write(String.format("Appel effectué le %s par %s dans le salon #%s.\n\n%d personnes présentes :\n",
                 df.format(date), teacherName, channelName, presents.size()));
 
-        for (String name : presents)
-        {
+        for (String name : presents) {
             fw.write(" - " + name + "\n");
+        }
+
+        if (absents != null) {
+            if (absents.isEmpty()) {
+                fw.write("\nAucune personne absente !");
+            } else {
+                fw.write(String.format("\n%d personnes absentes :\n", absents.size()));
+                for (String name : absents) {
+                    fw.write(" - " + name + "\n");
+                }
+            }
         }
 
         fw.flush();
         fw.close();
+    }
+
+    private String getSummary() {
+        if (objective == -1) {
+            return String.format("L'appel est terminé. %d personnes étaient présentes.", presents.size());
+        }
+        return String.format("L'appel est terminé. %d personnes sur %d étaient présentes.", presents.size(), objective);
     }
 }
