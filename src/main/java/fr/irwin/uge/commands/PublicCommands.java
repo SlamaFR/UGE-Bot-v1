@@ -118,13 +118,10 @@ public class PublicCommands
         else
         {
             String string = table.toString();
-            if (string.length() > 2000)
-            {
+            if (string.length() > 1990) {
                 MessageUtils.sendErrorMessage(textChannel, "Le tableau est trop grand.");
-            }
-            else
-            {
-                textChannel.sendMessage("```\n" + table + "\n```").queue();
+            } else {
+                textChannel.sendMessage("```\n" + string + "\n```").queue();
             }
         }
     }
