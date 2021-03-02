@@ -26,19 +26,17 @@ public class TeacherCommands {
         }
 
         int time = 5;
-        if (args.length >= 1) {
-            try {
-                if (Integer.parseInt(args[0]) <= 0) {
-                    throw new NumberFormatException();
-                }
-                time = Integer.parseInt(args[0]);
+        try {
+            if (Integer.parseInt(args[0]) <= 0) {
                 throw new NumberFormatException();
-            } catch (NumberFormatException e) {
-                if (message.getMentionedRoles().isEmpty()) {
-                    new CallManager(textChannel, member, time);
-                } else {
-                    new CallManager(textChannel, message.getMentionedRoles().get(0), member, time);
-                }
+            }
+            time = Integer.parseInt(args[0]);
+            throw new NumberFormatException();
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+            if (message.getMentionedRoles().isEmpty()) {
+                new CallManager(textChannel, member, time);
+            } else {
+                new CallManager(textChannel, message.getMentionedRoles().get(0), member, time);
             }
         }
     }
