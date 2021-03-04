@@ -57,12 +57,6 @@ public class MailUtils
 
     public static boolean isFromMoodle(Message message) throws MessagingException
     {
-        String[] moodleHeader = message.getHeader("X-Moodle-Originating-Script");
-        if (moodleHeader == null)
-        {
-            return false;
-        }
-
         String[] courseHeader = message.getHeader("X-Course-Name");
         if (courseHeader == null)
         {
