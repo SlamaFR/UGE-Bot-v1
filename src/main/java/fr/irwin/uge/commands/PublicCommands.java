@@ -16,11 +16,42 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
+import java.awt.*;
 import java.util.List;
 
 public class PublicCommands {
-    @Command(name = "keval", aliases = {"eval"})
-    private void keval(TextChannel textChannel, Message message, String[] args) {
+    @Command(name = "eval", aliases = {"keval"})
+    private void eval(TextChannel textChannel, String[] args) {
+        if (args.length == 0) {
+            textChannel.sendMessage(new EmbedBuilder()
+                .setTitle("(K)Eval")
+                .setDescription("Cette commande permet d'évaluer des expressions mathématiques simples")
+                .addField("Symboles disponibles: ", "", false)
+                .addField("Operateurs binaires", """
+                    - Soustraction `-`
+                    - Addition `+`
+                    - Multiplication `*` (assumée)
+                    - Division `/`
+                    - Puissance `^`
+                    - Reste (mod) `%`
+                    """, false)
+                .addField("Fonctions", """
+                    - Opposer `neg(expr)` (où expr est une expression)
+                    - Maximum `max(a, b)` (où a et b sont des expressions)
+                    - Minimum `min(a, b)` (où a et b sont des experssions)
+                    - Racine carrée `sqrt(expr)` (où expr est une expression)
+                    """, false)
+                .addField("Constantes", """
+                    - π `PI`
+                    - *e* `e` (constante de Néper)
+                    """, false)
+                .setColor(Color.CYAN)
+                .setFooter("N'hésitez pas à proposer de nouvelles fonctions (avec nom et arité)")
+                .setAuthor("notKamui")
+                .build()
+            ).queue();
+        }
+
         final var content = String.join(" ", args);
         double res;
         try {
