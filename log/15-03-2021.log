@@ -114,3 +114,38 @@ Caused by: java.net.ConnectException: Connection refused
 	at com.sun.mail.imap.IMAPStore.newIMAPProtocol(IMAPStore.java:748) ~[javax.mail-1.5.5.jar:1.5.5]
 	at com.sun.mail.imap.IMAPStore.protocolConnect(IMAPStore.java:684) ~[javax.mail-1.5.5.jar:1.5.5]
 	... 6 common frames omitted
+15-03-21 15:02:15 INFO  - Successfully loaded config!
+15-03-21 15:02:15 INFO  - Connecting to Redis...
+15-03-21 15:02:15 INFO  - Redisson 3.13.5
+15-03-21 15:02:15 INFO  - 1 connections initialized for /127.0.0.1:6379
+15-03-21 15:02:15 INFO  - 24 connections initialized for /127.0.0.1:6379
+15-03-21 15:02:15 INFO  - Successfully connected to Redis!
+15-03-21 15:02:16 INFO  - Login Successful!
+15-03-21 15:02:16 INFO  - Connected to WebSocket
+15-03-21 15:02:17 INFO  - Finished Loading!
+15-03-21 15:02:17 INFO  - Ready!
+15-03-21 15:02:17 INFO  - Connecting to mail server...
+15-03-21 15:02:17 ERROR - Failed to start mail manager!
+com.sun.mail.util.MailConnectException: Couldn't connect to host, port: , 993; timeout -1
+	at com.sun.mail.imap.IMAPStore.protocolConnect(IMAPStore.java:725) ~[javax.mail-1.5.5.jar:1.5.5]
+	at javax.mail.Service.connect(Service.java:366) ~[javax.mail-1.5.5.jar:1.5.5]
+	at javax.mail.Service.connect(Service.java:246) ~[javax.mail-1.5.5.jar:1.5.5]
+	at fr.irwin.uge.managers.MailManager.getStore(MailManager.java:179) ~[main/:na]
+	at fr.irwin.uge.managers.MailManager.<init>(MailManager.java:32) ~[main/:na]
+	at fr.irwin.uge.UGEBot.<init>(UGEBot.java:63) ~[main/:na]
+	at fr.irwin.uge.UGEBot.main(UGEBot.java:106) ~[main/:na]
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.connect0(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.connect(Net.java:574) ~[na:na]
+	at java.base/sun.nio.ch.Net.connect(Net.java:563) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:588) ~[na:na]
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:333) ~[na:na]
+	at java.base/java.net.Socket.connect(Socket.java:648) ~[na:na]
+	at java.base/java.net.Socket.connect(Socket.java:597) ~[na:na]
+	at com.sun.mail.util.SocketFetcher.createSocket(SocketFetcher.java:331) ~[javax.mail-1.5.5.jar:1.5.5]
+	at com.sun.mail.util.SocketFetcher.getSocket(SocketFetcher.java:238) ~[javax.mail-1.5.5.jar:1.5.5]
+	at com.sun.mail.iap.Protocol.<init>(Protocol.java:123) ~[javax.mail-1.5.5.jar:1.5.5]
+	at com.sun.mail.imap.protocol.IMAPProtocol.<init>(IMAPProtocol.java:126) ~[javax.mail-1.5.5.jar:1.5.5]
+	at com.sun.mail.imap.IMAPStore.newIMAPProtocol(IMAPStore.java:748) ~[javax.mail-1.5.5.jar:1.5.5]
+	at com.sun.mail.imap.IMAPStore.protocolConnect(IMAPStore.java:684) ~[javax.mail-1.5.5.jar:1.5.5]
+	... 6 common frames omitted

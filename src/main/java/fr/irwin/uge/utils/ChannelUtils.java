@@ -6,14 +6,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.Nullable;
 
-public class ChannelUtils
-{
+public final class ChannelUtils {
     @Nullable
-    public static TextChannel getAnnouncementsChannel(Guild guild)
-    {
+    public static TextChannel getAnnouncementsChannel(Guild guild) {
         Config.Guild guildConfig = UGEBot.config().guilds.get(guild.getId());
-        if (guildConfig == null)
-        {
+        if (guildConfig == null) {
             return null;
         }
 

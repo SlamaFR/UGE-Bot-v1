@@ -19,13 +19,11 @@ import javax.annotation.Nonnull;
 /**
  * Created on 04/10/2018.
  */
-public class EventListener extends ListenerAdapter
-{
+public final class EventListener extends ListenerAdapter {
     private final CommandMap commandMap;
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    public EventListener(CommandMap commandMap)
-    {
+    public EventListener(CommandMap commandMap) {
         this.commandMap = commandMap;
     }
 

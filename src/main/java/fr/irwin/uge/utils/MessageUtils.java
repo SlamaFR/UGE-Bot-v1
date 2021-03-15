@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
 
-public class MessageUtils {
+public final class MessageUtils {
     public static void sendMessage(
         String message,
         Color color,

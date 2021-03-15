@@ -15,17 +15,13 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MailUtils
-{
-    public static String decodeRFC_2047(String string)
-    {
-        if (string == null)
-        {
+public final class MailUtils {
+    public static String decodeRFC_2047(String string) {
+        if (string == null) {
             return null;
         }
         return Arrays.stream(string.replaceAll("[\n\r\t]", "").split(" ")).map(s -> {
-            try
-            {
+            try {
                 return MimeUtility.decodeWord(s);
             }
             catch (ParseException | UnsupportedEncodingException e)

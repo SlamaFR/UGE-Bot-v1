@@ -4,15 +4,12 @@ import fr.irwin.uge.redis.Redis;
 import net.dv8tion.jda.api.entities.Guild;
 import org.redisson.api.RBucket;
 
-public class RedisUtils
-{
-    public static <T> String getKey(Guild guild, T t)
-    {
+public final class RedisUtils {
+    public static <T> String getKey(Guild guild, T t) {
         return getKey(guild, t.getClass());
     }
 
-    public static <T> String getKey(Guild guild, Class<T> tClass)
-    {
+    public static <T> String getKey(Guild guild, Class<T> tClass) {
         return guild.getId() + ":" + tClass.getSimpleName() + "s";
     }
 

@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class CallManager {
+public final class CallManager {
     public static final String CALL_PRESENT_EMOTE = "🙋";
     private static final Logger LOGGER = LoggerFactory.getLogger(CallManager.class);
 

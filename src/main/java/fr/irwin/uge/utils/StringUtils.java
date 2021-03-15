@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class StringUtils {
+public final class StringUtils {
     public static boolean isCapitalized(String string) {
         return Pattern.matches("([A-ZÀ-Ÿ]([a-zà-ÿ]|-)+( |)){2,}", string);
     }

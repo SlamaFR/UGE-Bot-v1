@@ -20,8 +20,7 @@ import java.util.*;
 /**
  * Created on 04/10/2018.
  */
-public class UGEBot implements Runnable
-{
+public final class UGEBot implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(UGEBot.class);
     private static UGEBot instance;
 

@@ -20,15 +20,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-public class MailManager
-{
+public final class MailManager {
     public static final String SEPARATOR = "---------------------------------------------------------------------";
     private static final Logger LOGGER = LoggerFactory.getLogger(MailManager.class);
 
     private Folder inbox;
 
-    public MailManager() throws MessagingException
-    {
+    public MailManager() throws MessagingException {
         this.inbox = getStore().getFolder("INBOX");
         this.inbox.open(Folder.READ_ONLY);
         this.inbox.addConnectionListener(new ConnectionAdapter()
