@@ -8,6 +8,8 @@ public class ASCIITable
 {
     /**
      * Represents chars composing the ASCII table [bottom][up][left][right].
+     * <p>
+     * Watch out, speaking in Minecraft Enchant Table is required !
      */
     private static final char[][][][] CHARS = {{{{' ', '╶'}, {'╴', '─'}}, {{'╵', '└'}, {'┘', '┴'}}}, {{{'╷', '┌'}, {'┐', '┬'}}, {{'│', '├'}, {'┤', '┼'}}}};
     private static final char HORIZONTAL = CHARS[0][0][1][1];
