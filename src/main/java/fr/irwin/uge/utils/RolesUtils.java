@@ -22,14 +22,12 @@ public final class RolesUtils {
                                                         r.getId().equals(managerRoleId)) || isAdmin(member);
     }
 
-    public static boolean isAdmin(Member member)
-    {
+    public static boolean isAdmin(Member member) {
         String adminRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.adminRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(adminRoleId)) || member.isOwner();
     }
 
-    public static long commonRoles(Collection<Role> roles1, Collection<Role> roles2)
-    {
+    public static long commonRoles(Collection<Role> roles1, Collection<Role> roles2) {
         return roles1.stream().filter(roles2::contains).count();
     }
 }

@@ -13,24 +13,20 @@ public final class RedisUtils {
         return guild.getId() + ":" + tClass.getSimpleName() + "s";
     }
 
-    public static <T> void addFeature(Guild guild, long messageId, T t)
-    {
+    public static <T> void addFeature(Guild guild, long messageId, T t) {
         Redis.instance().getMap(getKey(guild, t)).put(messageId, t);
     }
 
-    public static <T> void removeFeature(Guild guild, long messageId, T t)
-    {
+    public static <T> void removeFeature(Guild guild, long messageId, T t) {
         Redis.instance().getMap(getKey(guild, t)).remove(messageId);
     }
 
-    public static <T> T getObject(Class<T> tClass)
-    {
+    public static <T> T getObject(Class<T> tClass) {
         RBucket<T> bucket = Redis.instance().getBucket(tClass.getSimpleName());
         return bucket.get();
     }
 
-    public static <T> void setObject(T t)
-    {
+    public static <T> void setObject(T t) {
         RBucket<T> bucket = Redis.instance().getBucket(t.getClass().getSimpleName());
         bucket.set(t);
     }

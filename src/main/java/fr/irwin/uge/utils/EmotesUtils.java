@@ -11,12 +11,9 @@ public final class EmotesUtils {
     public static final String NO = "<:no:514172078153400335>";
 
     public static String getEmote(MessageReaction.ReactionEmote emote) {
-        try
-        {
+        try {
             return emote.getEmoji();
-        }
-        catch (IllegalStateException ex)
-        {
+        } catch (IllegalStateException ex) {
             return "<:" + emote.getAsReactionCode() + '>';
         }
     }
