@@ -1,10 +1,13 @@
 package fr.irwin.uge.commands;
 
+import com.notkamui.keval.KevalInvalidExpressionException;
+import com.notkamui.keval.KevalZeroDivisionException;
 import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.internals.ASCIITable;
 import fr.irwin.uge.managers.TicketManager;
 import fr.irwin.uge.utils.EmotesUtils;
+import fr.irwin.uge.utils.KevalUtils;
 import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,18 +18,31 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.List;
 
-public class PublicCommands
-{
-
-    @Command(name = "ticket")
-    private void ticket(Guild guild, TextChannel textChannel, Member member, Message message)
-    {
-        if (guild == null)
-        {
+public class PublicCommands {
+    @Command(name = "keval", aliases = {"eval"})
+    private void keval(TextChannel textChannel, Message message, String[] args) {
+        final var content = String.join(" ", args);
+        double res;
+        try {
+            res = KevalUtils.eval(content);
+        } catch (KevalInvalidExpressionException e) {
+            textChannel.sendMessage("```\nKeval Error: Invalid expression around " + e.getPosition() +
+                "\n" + e.getExpression() + "\n" + " ".repeat(Math.max(0, e.getPosition())) + "^" +
+                "\n```").queue();
+            return;
+        } catch (KevalZeroDivisionException e) {
+            textChannel.sendMessage("```\nKeval Error: Zero Division\n```").queue();
             return;
         }
-        if (!UGEBot.config().guilds.containsKey(guild.getId()))
-        {
+        textChannel.sendMessage("```\n" + res + "\n```").queue();
+    }
+
+    @Command(name = "ticket")
+    private void ticket(Guild guild, TextChannel textChannel, Member member, Message message) {
+        if (guild == null) {
+            return;
+        }
+        if (!UGEBot.config().guilds.containsKey(guild.getId())) {
             return;
         }
 
@@ -55,42 +71,42 @@ public class PublicCommands
         if (args.isEmpty())
         {
             textChannel
-                    .sendMessage(new EmbedBuilder()
-                            .setTitle("Générateur de tableaux ASCII")
-                            .setDescription(
-                                    "Cette commande permet de générer rapidement des tableaux avec des caractères ASCII.")
-                            .addField("Utilisation", "`!table <Ligne 1> <Ligne 2> ... <Ligne N>`", false)
-                            .addField("Syntaxe", """
-                                                 Une ligne est divisée en colonnes par le caractère `;`.
-                                                 Si une ligne contient un ou plusieurs espaces, il faut l'encadrer avec des guillemets pour éviter des comportements inattendus.
-                                                 Pour dessiner une case vide, sans les bordures, la cellule ne doit contenir que des espaces.
-                                                 """, false)
-                            .addField("Exemple 1", """
-                                                             `!table ";Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
-                                                             ```
-                                                   ┌─────────┬───────────┬───────────┐
-                                                   │         │ Colonne 1 │ Colonne 2 │
-                                                   ├─────────┼───────────┼───────────┤
-                                                   │ Ligne 1 │ Val 1     │ Val 2     │
-                                                   ├─────────┼───────────┼───────────┤
-                                                   │ ou      │ comme     │ ceci      │
-                                                   └─────────┴───────────┴───────────┘
-                                                   ```
-                                                   """, false)
-                            .addField("Exemple 2", """
-                                                             `!table " ;Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
-                                                             ```
-                                                             ┌───────────┬───────────┐
-                                                             │ Colonne 1 │ Colonne 2 │
-                                                   ┌─────────┼───────────┼───────────┤
-                                                   │ Ligne 1 │ Val 1     │ Val 2     │
-                                                   ├─────────┼───────────┼───────────┤
-                                                   │ ou      │ comme     │ ceci      │
-                                                   └─────────┴───────────┴───────────┘
-                                                   ```
-                                                   """, false)
-                            .build())
-                    .queue();
+                .sendMessage(new EmbedBuilder()
+                    .setTitle("Générateur de tableaux ASCII")
+                    .setDescription(
+                        "Cette commande permet de générer rapidement des tableaux avec des caractères ASCII.")
+                    .addField("Utilisation", "`!table <Ligne 1> <Ligne 2> ... <Ligne N>`", false)
+                    .addField("Syntaxe", """
+                        Une ligne est divisée en colonnes par le caractère `;`.
+                        Si une ligne contient un ou plusieurs espaces, il faut l'encadrer avec des guillemets pour éviter des comportements inattendus.
+                        Pour dessiner une case vide, sans les bordures, la cellule ne doit contenir que des espaces.
+                        """, false)
+                    .addField("Exemple 1", """
+                                  `!table ";Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
+                                  ```
+                        ┌─────────┬───────────┬───────────┐
+                        │         │ Colonne 1 │ Colonne 2 │
+                        ├─────────┼───────────┼───────────┤
+                        │ Ligne 1 │ Val 1     │ Val 2     │
+                        ├─────────┼───────────┼───────────┤
+                        │ ou      │ comme     │ ceci      │
+                        └─────────┴───────────┴───────────┘
+                        ```
+                        """, false)
+                    .addField("Exemple 2", """
+                                  `!table " ;Colonne 1;Colonne 2" "Ligne 1;Val 1;Val 2" ou;comme;ceci`
+                                  ```
+                                  ┌───────────┬───────────┐
+                                  │ Colonne 1 │ Colonne 2 │
+                        ┌─────────┼───────────┼───────────┤
+                        │ Ligne 1 │ Val 1     │ Val 2     │
+                        ├─────────┼───────────┼───────────┤
+                        │ ou      │ comme     │ ceci      │
+                        └─────────┴───────────┴───────────┘
+                        ```
+                        """, false)
+                    .build())
+                .queue();
             return;
         }
 
