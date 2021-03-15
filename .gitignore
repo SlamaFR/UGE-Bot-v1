@@ -2,6 +2,7 @@
 .gradle/
 gradle/wrapper/
 build/
+log/
 
 *.json
 *.txt
