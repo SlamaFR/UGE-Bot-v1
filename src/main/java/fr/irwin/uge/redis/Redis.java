@@ -8,14 +8,12 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Redis
-{
+public final class Redis {
     private static final Logger LOGGER = LoggerFactory.getLogger(Redis.class);
     private static Redis instance;
     private final RedissonClient redissonClient;
 
-    private Redis()
-    {
+    private Redis() {
         final String host = UGEBot.config().redis.host;
         final int port = UGEBot.config().redis.port;
         final String password = UGEBot.config().redis.password;

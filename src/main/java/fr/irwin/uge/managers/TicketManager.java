@@ -18,8 +18,7 @@ import java.awt.*;
 import java.util.Queue;
 import java.util.*;
 
-public class TicketManager extends ListenerAdapter
-{
+public final class TicketManager extends ListenerAdapter {
     public static final int QUEUE_LIST_MAX_LINES = 5;
     public static final int COOLDOWN = 180;
     public static final int QUEUE_TIMEOUT = 3600;

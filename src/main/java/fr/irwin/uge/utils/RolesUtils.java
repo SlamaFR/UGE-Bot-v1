@@ -9,30 +9,25 @@ import java.util.Collection;
 /**
  * Created on 04/10/2018.
  */
-public class RolesUtils
-{
-    public static boolean isStudent(Member member)
-    {
+public final class RolesUtils {
+    public static boolean isStudent(Member member) {
         String studentRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.studentRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(studentRoleId));
     }
 
-    public static boolean isTeacher(Member member)
-    {
+    public static boolean isTeacher(Member member) {
         String teacherRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.teacherRole;
         String managerRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.managerRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(teacherRoleId) ||
                                                         r.getId().equals(managerRoleId)) || isAdmin(member);
     }
 
-    public static boolean isAdmin(Member member)
-    {
+    public static boolean isAdmin(Member member) {
         String adminRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.adminRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(adminRoleId)) || member.isOwner();
     }
 
-    public static long commonRoles(Collection<Role> roles1, Collection<Role> roles2)
-    {
+    public static long commonRoles(Collection<Role> roles1, Collection<Role> roles2) {
         return roles1.stream().filter(roles2::contains).count();
     }
 }
