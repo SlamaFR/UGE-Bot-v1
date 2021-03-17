@@ -9,7 +9,6 @@ import fr.irwin.uge.features.channel.TrafficNotifier;
 import fr.irwin.uge.features.message.AutoRole;
 import fr.irwin.uge.features.message.OrganizationDisplay;
 import fr.irwin.uge.internals.EventWaiter;
-import fr.irwin.uge.redis.Redis;
 import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.RolesUtils;
 import fr.irwin.uge.utils.SwearUtils;
@@ -160,30 +159,25 @@ public class AdminCommands
     }
 
     @Command(name = "tg", aliases = {"laferme"})
-    private void tg(Guild guild, TextChannel textChannel, Message message, Member member, String[] args){
+    private void tg(Guild guild, TextChannel textChannel, Message message, Member member, String[] args) {
         if (guild == null || !RolesUtils.isAdmin(member)) {
             return;
         }
-        if (args.length == 0){
+        if (args.length == 0) {
             textChannel.sendMessage("Qui doit donc se taire ?").queue();
-        }
-        else{
-            if(!message.getMentionedMembers().isEmpty()){
-                Role role = SwearUtils.getOrCreateRole(guild);
-                for (Member m : message.getMentionedMembers()) {
-                    if (m.getRoles().contains(role)) {
-                        guild.removeRoleFromMember(m.getId(), Objects.requireNonNull(role)).queue();
-                        textChannel.sendMessage("Bon aller "+m.getEffectiveName()+" du balais.").queue();
-                    }
-                    else{
-                        guild.addRoleToMember(m.getId(), Objects.requireNonNull(role)).queue();
-                        textChannel.sendMessage("C'est parti "+m.getEffectiveName()+" je tiens ta veste.").queue();
-                    }
+        } else if (!message.getMentionedMembers().isEmpty()) {
+            Role role = SwearUtils.getOrCreateRole(guild);
+            for (Member m : message.getMentionedMembers()) {
+                if (m.getRoles().contains(role)) {
+                    guild.removeRoleFromMember(m.getId(), Objects.requireNonNull(role)).queue();
+                    textChannel.sendMessage("Bon aller " + m.getEffectiveName() + " du balais.").queue();
+                } else {
+                    guild.addRoleToMember(m.getId(), Objects.requireNonNull(role)).queue();
+                    textChannel.sendMessage("C'est parti " + m.getEffectiveName() + " je tiens ta veste.").queue();
                 }
             }
         }
     }
-
 
     private void restoreOrStartMessageFeature(MessageFeature feature, Message message, String[] args) {
         if (args.length == 2) {
