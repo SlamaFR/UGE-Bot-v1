@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public final class StringUtils {
+public final class StringUtils
+{
     public static boolean isCapitalized(String string) {
         return Pattern.matches("([A-ZÀ-Ÿ]([a-zà-ÿ]|-)+( |)){2,}", string);
     }
@@ -12,11 +13,11 @@ public final class StringUtils {
     public static String capitalizeString(String string) {
         if (string == null) return null;
         return Pattern.compile("(^|\\s|-)+.")
-            .matcher(string)
-            .replaceAll(match -> {
-                String s = match.group();
-                return s.substring(0, s.length() - 1) + Character.toUpperCase(s.charAt(s.length() - 1));
-            });
+                .matcher(string)
+                .replaceAll(match -> {
+                    String s = match.group();
+                    return s.substring(0, s.length() - 1) + Character.toUpperCase(s.charAt(s.length() - 1));
+                });
     }
 
     public static String trim(String string) {
@@ -36,10 +37,10 @@ public final class StringUtils {
         final var regexMatcher = regex.matcher(string);
         while (regexMatcher.find()) {
             matchList.add(
-                regexMatcher
-                    .group(0)
-                    .replaceAll("(?<!\\\\)\"", "")
-                    .replaceAll("\\\\\"", "\"")
+                    regexMatcher
+                            .group(0)
+                            .replaceAll("(?<!\\\\)\"", "")
+                            .replaceAll("\\\\\"", "\"")
             );
         }
         return matchList;

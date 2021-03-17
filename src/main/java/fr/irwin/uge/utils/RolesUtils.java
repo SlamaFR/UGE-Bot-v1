@@ -9,7 +9,8 @@ import java.util.Collection;
 /**
  * Created on 04/10/2018.
  */
-public final class RolesUtils {
+public final class RolesUtils
+{
     public static boolean isStudent(Member member) {
         String studentRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.studentRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(studentRoleId));
@@ -19,7 +20,7 @@ public final class RolesUtils {
         String teacherRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.teacherRole;
         String managerRoleId = UGEBot.config().guilds.get(member.getGuild().getId()).roles.managerRole;
         return member.getRoles().stream().anyMatch(r -> r.getId().equals(teacherRoleId) ||
-                                                        r.getId().equals(managerRoleId)) || isAdmin(member);
+                r.getId().equals(managerRoleId)) || isAdmin(member);
     }
 
     public static boolean isAdmin(Member member) {

@@ -20,7 +20,8 @@ import java.util.*;
 /**
  * Created on 04/10/2018.
  */
-public final class UGEBot implements Runnable {
+public final class UGEBot implements Runnable
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(UGEBot.class);
     private static UGEBot instance;
 
@@ -33,8 +34,7 @@ public final class UGEBot implements Runnable {
     private Config config;
     private boolean running;
 
-    public UGEBot(String configPath) throws LoginException, JsonProcessingException
-    {
+    public UGEBot(String configPath) throws LoginException, JsonProcessingException {
         instance = this;
         commandMap = new CommandMap();
         config = Config.parseFile(configPath);
@@ -47,23 +47,17 @@ public final class UGEBot implements Runnable {
                 .addEventListeners(new EventListener(commandMap))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
-        try
-        {
+        try {
             jda.awaitReady();
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        try
-        {
+        try {
             LOGGER.info("Connecting to mail server...");
             new MailManager();
             LOGGER.info("Successfully connected to mail server!");
-        }
-        catch (MessagingException e)
-        {
+        } catch (MessagingException e) {
             LOGGER.error("Failed to start mail manager!", e);
         }
 
@@ -74,16 +68,12 @@ public final class UGEBot implements Runnable {
         new Timer().schedule(new TimerTask()
         {
             @Override
-            public void run()
-            {
+            public void run() {
                 Object[] keys = games.keySet().toArray();
                 String key = (String) keys[generator.nextInt(keys.length)];
-                try
-                {
+                try {
                     jda.getPresence().setActivity(Activity.of(Activity.ActivityType.valueOf(games.get(key)), key));
-                }
-                catch (IllegalArgumentException e)
-                {
+                } catch (IllegalArgumentException e) {
                     LOGGER.warn("Activity \"{}\" has unknown type ({})", key, games.get(key));
                     jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, key));
                 }
@@ -91,54 +81,41 @@ public final class UGEBot implements Runnable {
         }, 0, 10 * 60 * 1000);
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         String configPath = "./config.json";
 
-        if (args.length > 0)
-        {
+        if (args.length > 0) {
             configPath = args[0];
         }
 
-        try
-        {
+        try {
             new Thread(new UGEBot(configPath)).start();
-        }
-        catch (LoginException e)
-        {
+        } catch (LoginException e) {
             LOGGER.error("Provided token is incorrect!");
             System.exit(1);
-        }
-        catch (JsonProcessingException e)
-        {
+        } catch (JsonProcessingException e) {
             LOGGER.error("Error occurred whilst parsing config.json!", e);
             System.exit(1);
         }
     }
 
-    public static UGEBot instance()
-    {
+    public static UGEBot instance() {
         return instance;
     }
 
-    public static Config config()
-    {
+    public static Config config() {
         return instance().config;
     }
 
-    public static JDA JDA()
-    {
+    public static JDA JDA() {
         return instance().jda;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         running = true;
-        while (running)
-        {
-            if (scanner.hasNextLine())
-            {
+        while (running) {
+            if (scanner.hasNextLine()) {
                 commandMap.commandConsole(scanner.nextLine());
             }
         }
@@ -151,20 +128,15 @@ public final class UGEBot implements Runnable {
         System.exit(0);
     }
 
-    public void setRunning(boolean running)
-    {
+    public void setRunning(boolean running) {
         this.running = running;
     }
 
-    public void reloadConfig()
-    {
-        try
-        {
+    public void reloadConfig() {
+        try {
             config = Config.parseFile("./config.json");
             LOGGER.info("Successfully reloaded config!");
-        }
-        catch (JsonProcessingException e)
-        {
+        } catch (JsonProcessingException e) {
             LOGGER.error("Error whilst reloading config! Check your file.");
         }
     }

@@ -32,16 +32,14 @@ public class ASCIITable
     /**
      * @return new instance of ASCIITable.
      */
-    public static ASCIITable of()
-    {
+    public static ASCIITable of() {
         return new ASCIITable();
     }
 
     /**
      * @return current instance of ASCIITable.
      */
-    public ASCIITable nextRow()
-    {
+    public ASCIITable nextRow() {
         currentRow = addRow() - 1;
         currentCol = -1;
         return this;
@@ -50,11 +48,9 @@ public class ASCIITable
     /**
      * @return current instance of ASCIITable.
      */
-    public ASCIITable nextCell()
-    {
+    public ASCIITable nextCell() {
         currentCol++;
-        if (currentCol == col)
-        {
+        if (currentCol == col) {
             currentCol = addColumn() - 1;
         }
         return this;
@@ -65,8 +61,7 @@ public class ASCIITable
      *
      * @return current instance of ASCIITable.
      */
-    public ASCIITable blank()
-    {
+    public ASCIITable blank() {
         return setText("§");
     }
 
@@ -76,16 +71,13 @@ public class ASCIITable
      * @param text text to put in the cell.
      * @return current instance of ASCIITable.
      */
-    public ASCIITable setText(String text)
-    {
-        if (!" ".equals(text))
-        {
+    public ASCIITable setText(String text) {
+        if (!" ".equals(text)) {
             text = ' ' + text + ' ';
         }
 
         table.get(currentRow).set(currentCol, text);
-        if (text.length() > colWidths.get(currentCol))
-        {
+        if (text.length() > colWidths.get(currentCol)) {
             colWidths.set(currentCol, text.length() - (text.split("\\\\§", -1).length - 1));
         }
         return this;
@@ -94,14 +86,10 @@ public class ASCIITable
     /**
      * @return whether every cell of the table is empty.
      */
-    public boolean isEmpty()
-    {
-        for (int row = 0; row < this.row; row++)
-        {
-            for (int col = 0; col < this.col; col++)
-            {
-                if (!empty(row, col))
-                {
+    public boolean isEmpty() {
+        for (int row = 0; row < this.row; row++) {
+            for (int col = 0; col < this.col; col++) {
+                if (!empty(row, col)) {
                     return false;
                 }
             }
@@ -114,8 +102,7 @@ public class ASCIITable
      *
      * @return new row count.
      */
-    private int addRow()
-    {
+    private int addRow() {
         table.add(new ArrayList<>());
         table.get(row).addAll(Collections.nCopies(col, ""));
         return ++row;
@@ -126,8 +113,7 @@ public class ASCIITable
      *
      * @return new column count.
      */
-    private int addColumn()
-    {
+    private int addColumn() {
         table.forEach(r -> r.add(""));
         colWidths.add(0);
         return ++col;
@@ -136,14 +122,11 @@ public class ASCIITable
     /**
      * @return whether the cell at [{@code row}, {@code col}] is empty.
      */
-    private boolean empty(int row, int col)
-    {
-        if (row < 0 || row >= this.row)
-        {
+    private boolean empty(int row, int col) {
+        if (row < 0 || row >= this.row) {
             return true;
         }
-        if (col < 0 || col >= this.col)
-        {
+        if (col < 0 || col >= this.col) {
             return true;
         }
         return table.get(row).get(col).trim().isEmpty();// || "§".equals(table.get(row).get(col));
@@ -152,18 +135,13 @@ public class ASCIITable
     /**
      * @return returns the upper horizontal line of the {@code n}th row.
      */
-    private String getHorizontalLine(int n)
-    {
+    private String getHorizontalLine(int n) {
         StringBuilder builder = new StringBuilder();
-        for (int col = 0; col < this.col; col++)
-        {
+        for (int col = 0; col < this.col; col++) {
             builder.append(getIntersect(n, col));
-            if (!empty(n - 1, col) || !empty(n, col))
-            {
+            if (!empty(n - 1, col) || !empty(n, col)) {
                 builder.append(String.valueOf(HORIZONTAL).repeat(colWidths.get(col)));
-            }
-            else
-            {
+            } else {
                 builder.append(String.valueOf(' ').repeat(colWidths.get(col)));
             }
         }
@@ -174,8 +152,7 @@ public class ASCIITable
     /**
      * @return the char at the intersection of the north west edge of the cell at [{@code row}, {@code col}].
      */
-    private char getIntersect(int row, int col)
-    {
+    private char getIntersect(int row, int col) {
         int up = empty(row - 1, col - 1) && empty(row - 1, col) ? 0 : 1;
         int bottom = empty(row, col - 1) && empty(row, col) ? 0 : 1;
         int left = empty(row - 1, col - 1) && empty(row, col - 1) ? 0 : 1;
@@ -184,16 +161,13 @@ public class ASCIITable
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        for (int row = 0; row < this.row; row++)
-        {
+        for (int row = 0; row < this.row; row++) {
             builder.append(getHorizontalLine(row));
             builder.append('\n');
-            for (int col = 0; col < this.col; col++)
-            {
+            for (int col = 0; col < this.col; col++) {
                 String cellValue = table.get(row).get(col).replaceAll("(?<!\\\\)§", "").replaceAll("\\\\§", "§");
                 builder.append((!empty(row, col) || !empty(row, col - 1)) ? VERTICAL : ' ');
                 builder.append(cellValue).append(String.valueOf(' ').repeat(colWidths.get(col) - cellValue.length()));

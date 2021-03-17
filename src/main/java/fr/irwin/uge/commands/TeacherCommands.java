@@ -12,7 +12,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class TeacherCommands {
+public class TeacherCommands
+{
     @Command(name = "call", aliases = {"appel"})
     private void call(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
         if (guild == null) {

@@ -26,8 +26,7 @@ public class AutoRole extends MessageFeature
     private final boolean rolesList;
     private final int maxRoles;
 
-    public AutoRole(@NotNull TextChannel textChannel, String title, String description, Map<String, String> roles, boolean rolesList, int maxRoles)
-    {
+    public AutoRole(@NotNull TextChannel textChannel, String title, String description, Map<String, String> roles, boolean rolesList, int maxRoles) {
         super(textChannel.getGuild().getIdLong(), textChannel.getIdLong());
         this.title = title;
         this.description = description;
@@ -39,8 +38,7 @@ public class AutoRole extends MessageFeature
         fillRolesCollection();
     }
 
-    public AutoRole(@NotNull TextChannel textChannel, Config.Guild.AutoRole config)
-    {
+    public AutoRole(@NotNull TextChannel textChannel, Config.Guild.AutoRole config) {
         this(textChannel, config.title, config.description, config.roles, config.rolesList, config.maxRoles);
     }
 
@@ -52,8 +50,7 @@ public class AutoRole extends MessageFeature
             @JsonProperty("title") String title,
             @JsonProperty("description") String description,
             @JsonProperty("roles") Map<String, String> roles,
-            @JsonProperty("rolesList") boolean rolesList, @JsonProperty("maxRoles") int maxRoles)
-    {
+            @JsonProperty("rolesList") boolean rolesList, @JsonProperty("maxRoles") int maxRoles) {
         super(guildId, textChannelId);
         this.title = title;
         this.description = description;
@@ -66,23 +63,19 @@ public class AutoRole extends MessageFeature
     }
 
     @Override
-    public void send()
-    {
+    public void send() {
         final MessageEmbed messageEmbed = getMessageEmbed();
-        if (messageEmbed == null)
-        {
+        if (messageEmbed == null) {
             return;
         }
 
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null)
-        {
+        if (guild == null) {
             return;
         }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null)
-        {
+        if (textChannel == null) {
             return;
         }
 
@@ -92,83 +85,65 @@ public class AutoRole extends MessageFeature
     }
 
     @Override
-    protected void start(Message m)
-    {
+    protected void start(Message m) {
         roles.keySet().stream().sorted().map(e -> e.replace(">", "")).forEach(e -> m.addReaction(e).queue());
         new EventWaiter.Builder(GuildMessageReactionAddEvent.class, e -> e.getMessageIdLong() == m.getIdLong() &&
-                                                                         !e.getUser().isBot() &&
-                                                                         (RolesUtils.commonRoles(e.getMember().getRoles(), rolesCollection) <
-                                                                          maxRoles ||
-                                                                          RolesUtils.isAdmin(e.getMember())), (e, ew) -> {
+                !e.getUser().isBot() &&
+                (RolesUtils.commonRoles(e.getMember().getRoles(), rolesCollection) <
+                        maxRoles ||
+                        RolesUtils.isAdmin(e.getMember())), (e, ew) -> {
             String emote;
-            try
-            {
+            try {
                 emote = e.getReactionEmote().getEmoji();
-            }
-            catch (IllegalStateException ex)
-            {
+            } catch (IllegalStateException ex) {
                 emote = "<:" + e.getReactionEmote().getAsReactionCode() + '>';
             }
-            if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember()))
-            {
+            if (emote.equals("❌") && RolesUtils.isAdmin(e.getMember())) {
                 ew.close();
                 RedisUtils.removeFeature(e.getGuild(), m.getIdLong(), this);
                 return;
             }
             Role role = m.getGuild().getRoleById(roles.get(emote));
-            if (role != null)
-            {
+            if (role != null) {
                 m.getGuild().addRoleToMember(e.getMember(), role).complete();
-            }
-            else
-            {
+            } else {
                 ew.close();
                 m.delete().queue();
             }
         }).autoClose(false).build();
     }
 
-    private void fillRolesCollection()
-    {
-        for (Map.Entry<String, String> entry : roles.entrySet())
-        {
+    private void fillRolesCollection() {
+        for (Map.Entry<String, String> entry : roles.entrySet()) {
             Role role = UGEBot.JDA().getRoleById(entry.getValue());
-            if (role == null)
-            {
+            if (role == null) {
                 return;
             }
             rolesCollection.add(role);
         }
     }
 
-    private MessageEmbed getMessageEmbed()
-    {
+    private MessageEmbed getMessageEmbed() {
         final String roleList = formatRoleList();
-        if (roleList == null)
-        {
+        if (roleList == null) {
             return null;
         }
 
         final EmbedBuilder builder = new EmbedBuilder().setTitle(title).setDescription(description);
-        if (rolesList)
-        {
+        if (rolesList) {
             builder.addField("Liste des rôles", roleList, false);
         }
         return builder.build();
     }
 
-    private String formatRoleList()
-    {
+    private String formatRoleList() {
         final StringBuilder stringBuilder = new StringBuilder();
-        for (Map.Entry<String, String> entry : this.roles.entrySet())
-        {
+        for (Map.Entry<String, String> entry : this.roles.entrySet()) {
             Role role = UGEBot.JDA().getRoleById(entry.getValue());
-            if (role == null)
-            {
+            if (role == null) {
                 return null;
             }
-            if (stringBuilder.length() > 0)
-            {
+            if (stringBuilder.length() > 0) {
                 stringBuilder.append("\n\n");
             }
             stringBuilder.append(String.format("%s : `%s`", entry.getKey(), role.getName()));

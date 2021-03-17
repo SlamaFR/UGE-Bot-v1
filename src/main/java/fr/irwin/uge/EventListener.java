@@ -22,7 +22,8 @@ import java.util.Random;
 /**
  * Created on 04/10/2018.
  */
-public final class EventListener extends ListenerAdapter {
+public final class EventListener extends ListenerAdapter
+{
     private final CommandMap commandMap;
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -31,14 +32,13 @@ public final class EventListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event)
-    {
+    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         super.onGuildMessageReceived(event);
-        if (event.getAuthor().isBot())
-        {
+        if (event.getAuthor().isBot()) {
             return;
         }
 
+<<<<<<< HEAD
         if (event.getMessage().getMember().getRoles().contains(
                 event.getGuild().getRolesByName(String.valueOf(
                         Redis.instance().getBucket(event.getGuild().getId()+":SwearerRole").get()),true).get(0))){
@@ -48,17 +48,18 @@ public final class EventListener extends ListenerAdapter {
         }
         if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag()))
         {
+=======
+        if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag())) {
+>>>>>>> 1b403482c352aa749cf0d55b8e34ed08275e4130
             commandMap.commandUser(event.getMessage().getContentRaw().replaceFirst("!", ""), event.getMessage());
         }
     }
 
     @Override
-    public void onReady(@Nonnull ReadyEvent event)
-    {
+    public void onReady(@Nonnull ReadyEvent event) {
         super.onReady(event);
 
-        for (Guild guild : event.getJDA().getGuilds())
-        {
+        for (Guild guild : event.getJDA().getGuilds()) {
             Redis.instance().getMap(RedisUtils.getKey(guild, AutoRole.class)).forEach((msgId, o) -> {
                 ((AutoRole) o).restore(String.valueOf(msgId), null);
             });
@@ -69,8 +70,7 @@ public final class EventListener extends ListenerAdapter {
         }
 
         TrafficNotifier manager = RedisUtils.getObject(TrafficNotifier.class);
-        if (manager != null)
-        {
+        if (manager != null) {
             TrafficNotifier.instance(manager);
             LOGGER.info("Restored TrafficNotifier!");
         }

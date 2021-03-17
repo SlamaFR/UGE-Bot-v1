@@ -22,21 +22,18 @@ public class CommandMap
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final List<BotCommand> registry = new ArrayList<>();
 
-    public CommandMap()
-    {
+    public CommandMap() {
         registerCommand(new InternalCommands());
         registerCommand(new AdminCommands());
         registerCommand(new TeacherCommands());
         registerCommand(new PublicCommands());
     }
 
-    public static String getTag()
-    {
+    public static String getTag() {
         return "!";
     }
 
-    private Object[] getCommand(String command)
-    {
+    private Object[] getCommand(String command) {
         String[] commandSplit = command.split(" ");
         String[] args = new String[commandSplit.length - 1];
         System.arraycopy(commandSplit, 1, args, 0, commandSplit.length - 1);
@@ -44,122 +41,83 @@ public class CommandMap
         return new Object[]{botCommand, args};
     }
 
-    private void registerCommand(Object object)
-    {
-        for (Method method : object.getClass().getDeclaredMethods())
-        {
-            if (method.isAnnotationPresent(Command.class))
-            {
+    private void registerCommand(Object object) {
+        for (Method method : object.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Command.class)) {
                 Command command = method.getAnnotation(Command.class);
                 method.setAccessible(true);
                 BotCommand botCommand;
                 botCommand = new BotCommand(command.name(), object, method);
                 commands.put(command.name(), botCommand);
                 Arrays.stream(command.aliases()).forEach(alias -> commands.put(alias, botCommand));
-                if (!registry.contains(botCommand))
-                {
+                if (!registry.contains(botCommand)) {
                     registry.add(botCommand);
                 }
             }
         }
     }
 
-    public void commandConsole(String command)
-    {
+    public void commandConsole(String command) {
         Object[] object = getCommand(command);
-        if (object[0] == null)
-        {
+        if (object[0] == null) {
             System.out.println("Unknown command.");
             return;
         }
         BotCommand cmd = (BotCommand) object[0];
-        try
-        {
+        try {
             execute(cmd, command, (String[]) object[1], null);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void commandUser(String command, Message message)
-    {
+    public void commandUser(String command, Message message) {
         Object[] object = getCommand(command);
-        if (object[0] == null)
-        {
+        if (object[0] == null) {
             return;
         }
         BotCommand cmd = (BotCommand) object[0];
-        try
-        {
+        try {
             Guild guild = message.getGuild();
-            if (UGEBot.config().guilds.containsKey(guild.getId()))
-            {
+            if (UGEBot.config().guilds.containsKey(guild.getId())) {
                 if (Arrays
                         .stream(UGEBot.config().guilds.get(guild.getId()).disabledCommands)
-                        .anyMatch(s -> s.equals(cmd.getName())))
-                {
+                        .anyMatch(s -> s.equals(cmd.getName()))) {
                     return;
                 }
             }
             execute(cmd, command, (String[]) object[1], message);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.printf("The %s command failed\n", cmd.getName());
             e.printStackTrace();
         }
     }
 
-    private void execute(BotCommand botCommand, String command, String[] args, Message message) throws Exception
-    {
+    private void execute(BotCommand botCommand, String command, String[] args, Message message) throws Exception {
         Parameter[] parameters = botCommand.getMethod().getParameters();
         Object[] objects = new Object[parameters.length];
-        for (int i = 0; i < parameters.length; i++)
-        {
-            if (parameters[i].getType() == String[].class)
-            {
+        for (int i = 0; i < parameters.length; i++) {
+            if (parameters[i].getType() == String[].class) {
                 objects[i] = args;
-            }
-            else if (parameters[i].getType() == User.class)
-            {
+            } else if (parameters[i].getType() == User.class) {
                 objects[i] = message == null ? null : message.getAuthor();
-            }
-            else if (parameters[i].getType() == BotCommand.class)
-            {
+            } else if (parameters[i].getType() == BotCommand.class) {
                 objects[i] = botCommand;
-            }
-            else if (parameters[i].getType() == TextChannel.class)
-            {
+            } else if (parameters[i].getType() == TextChannel.class) {
                 objects[i] = message == null ? null : message.getTextChannel();
-            }
-            else if (parameters[i].getType() == PrivateChannel.class)
-            {
+            } else if (parameters[i].getType() == PrivateChannel.class) {
                 objects[i] = message == null ? null : message.getPrivateChannel();
-            }
-            else if (parameters[i].getType() == Guild.class)
-            {
+            } else if (parameters[i].getType() == Guild.class) {
                 objects[i] = message == null ? null : message.getGuild();
-            }
-            else if (parameters[i].getType() == String.class)
-            {
+            } else if (parameters[i].getType() == String.class) {
                 objects[i] = command;
-            }
-            else if (parameters[i].getType() == Message.class)
-            {
+            } else if (parameters[i].getType() == Message.class) {
                 objects[i] = message;
-            }
-            else if (parameters[i].getType() == JDA.class)
-            {
+            } else if (parameters[i].getType() == JDA.class) {
                 objects[i] = UGEBot.JDA();
-            }
-            else if (parameters[i].getType() == Member.class)
-            {
+            } else if (parameters[i].getType() == Member.class) {
                 objects[i] = message == null ? null : message.getMember();
-            }
-            else if (parameters[i].getType() == MessageChannel.class)
-            {
+            } else if (parameters[i].getType() == MessageChannel.class) {
                 objects[i] = message == null ? null : message.getChannel();
             }
         }

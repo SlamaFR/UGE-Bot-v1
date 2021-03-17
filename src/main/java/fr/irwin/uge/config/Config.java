@@ -32,28 +32,21 @@ public class Config
     @JsonProperty(required = true)
     public Mail mail = new Mail();
 
-    public static Config parseFile(String path) throws JsonProcessingException
-    {
+    public static Config parseFile(String path) throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 
         final String jsonSource;
-        try
-        {
+        try {
             jsonSource = Files.readString(Paths.get(path));
             LOGGER.info("Successfully loaded config!");
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             LOGGER.warn("Missing config file!");
-            try
-            {
+            try {
                 mapper.writeValue(new File("./config.json"), new Config());
                 LOGGER.info("An empty config file has been created! Fill it and run the bot.");
                 System.exit(2);
                 return null;
-            }
-            catch (IOException e1)
-            {
+            } catch (IOException e1) {
                 LOGGER.error("Couldn't generate config file!");
                 System.exit(1);
                 return null;

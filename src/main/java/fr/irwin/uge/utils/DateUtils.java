@@ -4,7 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public final class DateUtils {
+public final class DateUtils
+{
     public static String dateWithFormat(Date date, String format) {
         return new SimpleDateFormat(format, Locale.FRENCH).format(date);
     }

@@ -25,26 +25,21 @@ import java.util.regex.Pattern;
 public class AdminCommands
 {
     @Command(name = "autorole")
-    private void autoRole(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
-    {
-        if (guild == null)
-        {
+    private void autoRole(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
+        if (guild == null) {
             return;
         }
-        if (!UGEBot.config().guilds.containsKey(guild.getId()))
-        {
+        if (!UGEBot.config().guilds.containsKey(guild.getId())) {
             return;
         }
-        if (!RolesUtils.isAdmin(member))
-        {
+        if (!RolesUtils.isAdmin(member)) {
             return;
         }
 
-        if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).autoRoles.containsKey(args[0]))
-        {
+        if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).autoRoles.containsKey(args[0])) {
             MessageUtils.sendErrorMessage(textChannel,
                     "Vous devez spécifier le nom d'un AutoRole parmi la liste suivante :\n" + "```\n" +
-                    String.join(", ", UGEBot.config().guilds.get(guild.getId()).autoRoles.keySet()) + "\n```");
+                            String.join(", ", UGEBot.config().guilds.get(guild.getId()).autoRoles.keySet()) + "\n```");
             return;
         }
 
@@ -56,52 +51,42 @@ public class AdminCommands
     }
 
     @Command(name = "traffic")
-    private void traffic(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
-    {
-        if (guild == null)
-        {
+    private void traffic(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
+        if (guild == null) {
             return;
         }
-        if (!RolesUtils.isAdmin(member))
-        {
+        if (!RolesUtils.isAdmin(member)) {
             return;
         }
 
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             TrafficNotifier.instance().registerTextChannel(textChannel.getIdLong());
             return;
         }
 
-        if (args[0].equals("off"))
-        {
+        if (args[0].equals("off")) {
             TrafficNotifier.instance().unregisterTextChannel(textChannel.getIdLong());
         }
         message.delete().queue();
     }
 
     @Command(name = "display")
-    private void display(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
-    {
-        if (guild == null)
-        {
+    private void display(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
+        if (guild == null) {
             return;
         }
-        if (!UGEBot.config().guilds.containsKey(guild.getId()))
-        {
+        if (!UGEBot.config().guilds.containsKey(guild.getId())) {
             return;
         }
-        if (!RolesUtils.isAdmin(member))
-        {
+        if (!RolesUtils.isAdmin(member)) {
             return;
         }
 
-        if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).organizationDisplays.containsKey(args[0]))
-        {
+        if (args.length < 1 || !UGEBot.config().guilds.get(guild.getId()).organizationDisplays.containsKey(args[0])) {
             MessageUtils.sendErrorMessage(textChannel,
                     "Vous devez spécifier le nom d'un Display parmi la liste suivante :\n" + "```\n" +
-                    String.join(", ", UGEBot.config().guilds.get(guild.getId()).organizationDisplays.keySet()) +
-                    "\n```");
+                            String.join(", ", UGEBot.config().guilds.get(guild.getId()).organizationDisplays.keySet()) +
+                            "\n```");
             return;
         }
 
@@ -115,10 +100,8 @@ public class AdminCommands
     }
 
     @Command(name = "broadcast", aliases = {"bc"})
-    private void broadcast(Guild guild, TextChannel textChannel, Member member, Message message, String[] args)
-    {
-        if (guild == null || !RolesUtils.isAdmin(member))
-        {
+    private void broadcast(Guild guild, TextChannel textChannel, Member member, Message message, String[] args) {
+        if (guild == null || !RolesUtils.isAdmin(member)) {
             return;
         }
 
@@ -126,26 +109,17 @@ public class AdminCommands
         final String senderName = member.getEffectiveName();
         final String courseName;
 
-        if (args.length > 0)
-        {
-            if (!message.getMentionedChannels().isEmpty())
-            {
-                if (args.length >= 2)
-                {
+        if (args.length > 0) {
+            if (!message.getMentionedChannels().isEmpty()) {
+                if (args.length >= 2) {
                     courseName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-                }
-                else
-                {
+                } else {
                     courseName = "Annonce générale";
                 }
-            }
-            else
-            {
+            } else {
                 courseName = String.join(" ", args);
             }
-        }
-        else
-        {
+        } else {
             courseName = "Annonce générale";
         }
         awaitingText.append("\n\nLe titre sera '").append(courseName).append("'.");
@@ -154,12 +128,9 @@ public class AdminCommands
         final Color color = member.getColor();
 
         final TextChannel broadcastChannel;
-        if (!message.getMentionedChannels().isEmpty())
-        {
+        if (!message.getMentionedChannels().isEmpty()) {
             broadcastChannel = message.getMentionedChannels().get(0);
-        }
-        else
-        {
+        } else {
             broadcastChannel = textChannel;
         }
         awaitingText.append("\n\nLe message sera envoyé dans ").append(broadcastChannel.getAsMention()).append(".");
@@ -175,8 +146,7 @@ public class AdminCommands
                 (e, ew) -> {
                     textChannel.deleteMessages(Arrays.asList(message, e.getMessage(), awaitingMessage)).queue();
 
-                    if (e.getMessage().getContentDisplay().equalsIgnoreCase("cancel"))
-                    {
+                    if (e.getMessage().getContentDisplay().equalsIgnoreCase("cancel")) {
                         ew.close();
                         return;
                     }
@@ -189,23 +159,16 @@ public class AdminCommands
                 }).build();
     }
 
-    private void restoreOrStartMessageFeature(MessageFeature feature, Message message, String[] args)
-    {
-        if (args.length == 2)
-        {
+    private void restoreOrStartMessageFeature(MessageFeature feature, Message message, String[] args) {
+        if (args.length == 2) {
             String messageId;
-            if (Pattern.matches("\\d{18}-\\d{18}", args[1]))
-            {
+            if (Pattern.matches("\\d{18}-\\d{18}", args[1])) {
                 messageId = args[1].split("-")[1];
-            }
-            else
-            {
+            } else {
                 messageId = args[1];
             }
             feature.restore(messageId, null);
-        }
-        else
-        {
+        } else {
             feature.send();
         }
     }
