@@ -6,19 +6,24 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.internals.ASCIITable;
 import fr.irwin.uge.managers.TicketManager;
-import fr.irwin.uge.redis.Redis;
-import fr.irwin.uge.utils.*;
+import fr.irwin.uge.utils.EmotesUtils;
+import fr.irwin.uge.utils.KevalUtils;
+import fr.irwin.uge.utils.MessageUtils;
+import fr.irwin.uge.utils.StringUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Objects;
 
 public class PublicCommands {
 
     @Command(name = "eval", aliases = {"keval"})
     private void eval(TextChannel textChannel, String[] args) {
+
         if (args.length == 0) {
             textChannel.sendMessage(new EmbedBuilder()
                     .setTitle("(K)Eval")
@@ -33,15 +38,28 @@ public class PublicCommands {
                             - Reste (mod) `%`
                             """, false)
                     .addField("Fonctions", """
-                            - Opposer `neg(expr)` (où expr est une expression)
-                            - Maximum `max(a, b)` (où a et b sont des expressions)
-                            - Minimum `min(a, b)` (où a et b sont des experssions)
-                            - Racine carrée `sqrt(expr)` (où expr est une expression)
-                            """, false)
+                        - Opposer `neg(expr)`
+                        - Maximum `max(a, b)`
+                        - Minimum `min(a, b)`
+                        - Racine carrée `sqrt(expr)`
+                        - Sinus `sin(expr)`
+                        - Cosinus `cos(expr)`
+                        - Tangente `tan(expr)`
+                        - Arcsinus `asin(expr)`
+                        - Arccosinus `acos(expr)`
+                        - Arctangente `atan(expr)`
+                        - Random `rand()` ([0; 1[)
+                        - Arrondi inférieur `floor(expr)`
+                        - Arrondi supérieur `ceil(expr)`
+                        - Logarithme base 10 `log(expr)`
+                        - Logarithme base 2 `logB(expr)`
+                        - Logarithme népérien `ln(expr)`
+                        """, false)
                     .addField("Constantes", """
-                            - π `PI`
-                            - *e* `e` (constante de Néper)
-                            """, false)
+                        - π `PI`
+                        - *e* `e` (constante de Néper)
+                        - φ `PHI`
+                        """, false)
                     .setColor(Color.CYAN)
                     .setFooter("N'hésitez pas à proposer de nouvelles fonctions (avec nom et arité)")
                     .setAuthor("notKamui")
@@ -50,19 +68,21 @@ public class PublicCommands {
         }
 
         final var content = String.join(" ", args);
-        double res;
+        Double res;
         try {
             res = KevalUtils.eval(content);
+            if (res == null) {
+                MessageUtils.sendErrorMessage(textChannel, "Keval n'a pas pu démarrer correctement.");
+            } else {
+                textChannel.sendMessage("```\n" + res + "\n```").queue();
+            }
         } catch (KevalInvalidExpressionException e) {
             textChannel.sendMessage("```\nKeval Error: Invalid expression around " + e.getPosition() +
                     "\n" + e.getExpression() + "\n" + " ".repeat(Math.max(0, e.getPosition())) + "^" +
                     "\n```").queue();
-            return;
         } catch (KevalZeroDivisionException e) {
             textChannel.sendMessage("```\nKeval Error: Zero Division\n```").queue();
-            return;
         }
-        textChannel.sendMessage("```\n" + res + "\n```").queue();
     }
 
     @Command(name = "ticket")
