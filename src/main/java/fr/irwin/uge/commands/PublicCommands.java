@@ -6,20 +6,42 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.internals.ASCIITable;
 import fr.irwin.uge.managers.TicketManager;
-import fr.irwin.uge.utils.EmotesUtils;
-import fr.irwin.uge.utils.KevalUtils;
-import fr.irwin.uge.utils.MessageUtils;
-import fr.irwin.uge.utils.StringUtils;
+import fr.irwin.uge.redis.Redis;
+import fr.irwin.uge.utils.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 import java.util.List;
 
 public class PublicCommands {
+
+    @Command(name = "tg", aliases = {"laferme"})
+    private void tg(Guild guild, TextChannel textChannel, Message message, String[] args){
+        if (args.length == 0){
+            textChannel.sendMessage("Qui doit donc se taire ?").queue();
+        }
+        else{
+            if(message.getMentionedMembers().isEmpty()){
+            }
+            else{
+                if(Redis.instance().getBucket(guild.getId()+":SwearerRole").get() == null){
+                    Role role = guild.createRole().setName("Swearer").complete();
+                    Redis.instance().getBucket(guild.getId()+":SwearerRole").set(role.getName());
+                }
+                for (Member m : message.getMentionedMembers()) {
+                    if (m.getRoles().contains(guild.getRolesByName(
+                            Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0))) {
+                        guild.removeRoleFromMember(m.getId(),guild.getRolesByName(
+                                Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0)).queue();
+                    }
+                    guild.addRoleToMember(m.getId(),guild.getRolesByName(
+                            Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0) ).queue();
+                }
+            }
+        }
+    }
+
     @Command(name = "eval", aliases = {"keval"})
     private void eval(TextChannel textChannel, String[] args) {
         if (args.length == 0) {

@@ -5,7 +5,9 @@ import fr.irwin.uge.features.channel.TrafficNotifier;
 import fr.irwin.uge.features.message.AutoRole;
 import fr.irwin.uge.features.message.OrganizationDisplay;
 import fr.irwin.uge.redis.Redis;
+import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.RedisUtils;
+import fr.irwin.uge.utils.SwearUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Random;
 
 /**
  * Created on 04/10/2018.
@@ -36,6 +39,13 @@ public final class EventListener extends ListenerAdapter {
             return;
         }
 
+        if (event.getMessage().getMember().getRoles().contains(
+                event.getGuild().getRolesByName(String.valueOf(
+                        Redis.instance().getBucket(event.getGuild().getId()+":SwearerRole").get()),true).get(0))){
+                if(Math.random()  < .1){
+                    event.getMessage().getChannel().sendMessage(SwearUtils.getSwear()).queue();
+                }
+        }
         if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag()))
         {
             commandMap.commandUser(event.getMessage().getContentRaw().replaceFirst("!", ""), event.getMessage());
