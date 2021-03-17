@@ -173,11 +173,11 @@ public class AdminCommands
                 for (Member m : message.getMentionedMembers()) {
                     if (m.getRoles().contains(role)) {
                         guild.removeRoleFromMember(m.getId(), Objects.requireNonNull(role)).queue();
-                        textChannel.sendMessage("Bon aller "+m.getEffectiveName()+" du balais").queue();
+                        textChannel.sendMessage("Bon aller "+m.getEffectiveName()+" du balais.").queue();
                     }
                     else{
                         guild.addRoleToMember(m.getId(), Objects.requireNonNull(role)).queue();
-                        textChannel.sendMessage("C'est parti "+m.getEffectiveName()+" je tiens ta veste").queue();
+                        textChannel.sendMessage("C'est parti "+m.getEffectiveName()+" je tiens ta veste.").queue();
                     }
                 }
             }

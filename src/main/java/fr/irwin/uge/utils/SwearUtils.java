@@ -26,7 +26,7 @@ public final class SwearUtils {
         else{
             role = guild.getRoleById(Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString());
             if (role == null){
-                role = guild.createRole().setName("Swearer").complete();
+                role = guild.createRole().setName("Verbeux").complete();
                 Redis.instance().getBucket(guild.getId()+":SwearerRole").set(role.getIdLong());
 
             }
