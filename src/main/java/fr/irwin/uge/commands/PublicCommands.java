@@ -13,40 +13,10 @@ import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
-<<<<<<< HEAD
 public class PublicCommands {
 
-    @Command(name = "tg", aliases = {"laferme"})
-    private void tg(Guild guild, TextChannel textChannel, Message message, String[] args){
-        if (args.length == 0){
-            textChannel.sendMessage("Qui doit donc se taire ?").queue();
-        }
-        else{
-            if(message.getMentionedMembers().isEmpty()){
-            }
-            else{
-                if(Redis.instance().getBucket(guild.getId()+":SwearerRole").get() == null){
-                    Role role = guild.createRole().setName("Swearer").complete();
-                    Redis.instance().getBucket(guild.getId()+":SwearerRole").set(role.getName());
-                }
-                for (Member m : message.getMentionedMembers()) {
-                    if (m.getRoles().contains(guild.getRolesByName(
-                            Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0))) {
-                        guild.removeRoleFromMember(m.getId(),guild.getRolesByName(
-                                Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0)).queue();
-                    }
-                    guild.addRoleToMember(m.getId(),guild.getRolesByName(
-                            Redis.instance().getBucket(guild.getId()+":SwearerRole").get().toString(),true).get(0) ).queue();
-                }
-            }
-        }
-    }
-
-=======
-public class PublicCommands
-{
->>>>>>> 1b403482c352aa749cf0d55b8e34ed08275e4130
     @Command(name = "eval", aliases = {"keval"})
     private void eval(TextChannel textChannel, String[] args) {
         if (args.length == 0) {
