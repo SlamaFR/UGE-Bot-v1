@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Config
@@ -24,6 +26,9 @@ public class Config
 
     @JsonProperty
     public Map<String, String> presenceMessages = new HashMap<>();
+
+    @JsonProperty
+    public List<String> swearingMessages = new ArrayList<>();
 
     @JsonProperty(required = true)
     public Map<String, Guild> guilds = new HashMap<>();

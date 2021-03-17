@@ -6,21 +6,17 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.commands.core.Command;
 import fr.irwin.uge.internals.ASCIITable;
 import fr.irwin.uge.managers.TicketManager;
-import fr.irwin.uge.utils.EmotesUtils;
-import fr.irwin.uge.utils.KevalUtils;
-import fr.irwin.uge.utils.MessageUtils;
-import fr.irwin.uge.utils.StringUtils;
+import fr.irwin.uge.redis.Redis;
+import fr.irwin.uge.utils.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
-public class PublicCommands
-{
+public class PublicCommands {
+
     @Command(name = "eval", aliases = {"keval"})
     private void eval(TextChannel textChannel, String[] args) {
         if (args.length == 0) {
