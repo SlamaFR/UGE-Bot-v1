@@ -5,8 +5,11 @@ import fr.irwin.uge.features.channel.TrafficNotifier;
 import fr.irwin.uge.features.message.AutoRole;
 import fr.irwin.uge.features.message.OrganizationDisplay;
 import fr.irwin.uge.redis.Redis;
+import fr.irwin.uge.utils.MessageUtils;
 import fr.irwin.uge.utils.RedisUtils;
+import fr.irwin.uge.utils.SwearUtils;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -15,12 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Created on 04/10/2018.
  */
-public final class EventListener extends ListenerAdapter
-{
+public final class EventListener extends ListenerAdapter {
     private final CommandMap commandMap;
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -34,7 +38,14 @@ public final class EventListener extends ListenerAdapter
         if (event.getAuthor().isBot()) {
             return;
         }
-
+        Member m = event.getMessage().getMember();
+        if(m != null) {
+            if (m.getRoles().contains(SwearUtils.getOrCreateRole(event.getGuild()))){
+                if (Math.random() < .009) {
+                    event.getMessage().getChannel().sendMessage(SwearUtils.getSwear()).queue();
+                }
+            }
+        }
         if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag())) {
             commandMap.commandUser(event.getMessage().getContentRaw().replaceFirst("!", ""), event.getMessage());
         }
