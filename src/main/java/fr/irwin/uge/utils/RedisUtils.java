@@ -4,7 +4,8 @@ import fr.irwin.uge.redis.Redis;
 import net.dv8tion.jda.api.entities.Guild;
 import org.redisson.api.RBucket;
 
-public final class RedisUtils {
+public final class RedisUtils
+{
     public static <T> String getKey(Guild guild, T t) {
         return getKey(guild, t.getClass());
     }

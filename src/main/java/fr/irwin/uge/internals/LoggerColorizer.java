@@ -8,11 +8,9 @@ import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase;
 public class LoggerColorizer extends ForegroundCompositeConverterBase<ILoggingEvent>
 {
     @Override
-    protected String getForegroundColorCode(ILoggingEvent iLoggingEvent)
-    {
+    protected String getForegroundColorCode(ILoggingEvent iLoggingEvent) {
         Level level = iLoggingEvent.getLevel();
-        switch (level.toInt())
-        {
+        switch (level.toInt()) {
             case Level.ERROR_INT:
                 return ANSIConstants.BOLD + ANSIConstants.RED_FG;
             case Level.WARN_INT:

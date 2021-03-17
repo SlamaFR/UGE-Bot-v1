@@ -15,8 +15,7 @@ public abstract class MessageFeature
     protected final long textChannelId;
     protected transient final Logger logger;
 
-    protected MessageFeature(long guildId, long textChannelId)
-    {
+    protected MessageFeature(long guildId, long textChannelId) {
         this.guildId = guildId;
         this.textChannelId = textChannelId;
         this.logger = LoggerFactory.getLogger(getClass());
@@ -24,31 +23,26 @@ public abstract class MessageFeature
 
     public abstract void send();
 
-    public void restore(String messageId, @Nullable Runnable success)
-    {
+    public void restore(String messageId, @Nullable Runnable success) {
         final Guild guild = UGEBot.JDA().getGuildById(guildId);
-        if (guild == null)
-        {
+        if (guild == null) {
             return;
         }
 
         final TextChannel textChannel = guild.getTextChannelById(textChannelId);
-        if (textChannel == null)
-        {
+        if (textChannel == null) {
             return;
         }
 
         textChannel.retrieveMessageById(messageId).queue(message -> {
-            if (!message.getAuthor().equals(UGEBot.JDA().getSelfUser()))
-            {
+            if (!message.getAuthor().equals(UGEBot.JDA().getSelfUser())) {
                 return;
             }
 
             start(message);
             RedisUtils.addFeature(textChannel.getGuild(), message.getIdLong(), this);
             logger.info("Restored {} on {}!", getClass().getSimpleName(), messageId);
-            if (success != null)
-            {
+            if (success != null) {
                 success.run();
             }
         }, failure -> logger.warn("Failed to restore {} on {}!", getClass().getSimpleName(), messageId));

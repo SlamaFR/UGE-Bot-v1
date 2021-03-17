@@ -15,13 +15,14 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class MailUtils {
+public final class MailUtils
+{
     public static String decodeRFC_2047(String string) {
         if (string == null) return null;
         return Arrays.stream(
-            string
-                .replaceAll("[\n\r\t]", "")
-                .split(" ")
+                string
+                        .replaceAll("[\n\r\t]", "")
+                        .split(" ")
         ).map(s -> {
             try {
                 return MimeUtility.decodeWord(s);
@@ -31,8 +32,7 @@ public final class MailUtils {
         }).collect(Collectors.joining()).trim();
     }
 
-    public static String extractContent(Message message) throws IOException, MessagingException
-    {
+    public static String extractContent(Message message) throws IOException, MessagingException {
         String content;
         if (message.getContent() instanceof Multipart) {
             content = new MimeMessageParser((MimeMessage) message).parse().getPlainContent();
@@ -53,16 +53,16 @@ public final class MailUtils {
 
         String[] listHeader = message.getHeader("List-Id");
         return listHeader != null &&
-            Arrays.stream(listHeader).anyMatch(s -> Pattern.matches("(.*annonces?.*)", s.toLowerCase()));
+                Arrays.stream(listHeader).anyMatch(s -> Pattern.matches("(.*annonces?.*)", s.toLowerCase()));
     }
 
     public static String getSenderName(Message message) throws MessagingException {
         String fromHeader = String
-            .join(" ", message.getHeader("From"))
-            .replaceAll("[\"\t\r\n]", "");
+                .join(" ", message.getHeader("From"))
+                .replaceAll("[\"\t\r\n]", "");
 
         String name = decodeRFC_2047(fromHeader)
-            .split("( \\(via| <)")[0].replace("\"", "");
+                .split("( \\(via| <)")[0].replace("\"", "");
 
         if (name.contains(" ")) {
             String[] s = name.split(" ");
@@ -78,8 +78,8 @@ public final class MailUtils {
         String[] split = h.split(":");
 
         h = String
-            .join(":", Arrays.copyOfRange(split, 1, split.length))
-            .replaceAll("[\"\t\r\n]", "");
+                .join(":", Arrays.copyOfRange(split, 1, split.length))
+                .replaceAll("[\"\t\r\n]", "");
         return (h.isEmpty()) ? null : h.trim();
     }
 

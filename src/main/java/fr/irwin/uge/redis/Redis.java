@@ -8,7 +8,8 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class Redis {
+public final class Redis
+{
     private static final Logger LOGGER = LoggerFactory.getLogger(Redis.class);
     private static Redis instance;
     private final RedissonClient redissonClient;
@@ -21,23 +22,19 @@ public final class Redis {
         this.redissonClient = initRedisson(host, port, password);
     }
 
-    public static RedissonClient instance()
-    {
-        if (instance == null)
-        {
+    public static RedissonClient instance() {
+        if (instance == null) {
             instance = new Redis();
         }
         return instance.redissonClient;
     }
 
-    public static void close()
-    {
+    public static void close() {
         LOGGER.info("Closing Redis connection...");
         Redis.instance().shutdown();
     }
 
-    private RedissonClient initRedisson(String host, int port, String password)
-    {
+    private RedissonClient initRedisson(String host, int port, String password) {
         final Config config = new Config();
 
         LOGGER.info("Connecting to Redis...");
@@ -49,12 +46,9 @@ public final class Redis {
                 "redis://" + host + ":" + port).setPassword(password).setDatabase(0).setClientName("uge-bot");
 
         RedissonClient redissonClient;
-        try
-        {
+        try {
             redissonClient = Redisson.create(config);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.error("Couldn't connect to Redis!");
             System.exit(1);
             return null;

@@ -20,8 +20,7 @@ public class EventWaiter implements EventListener
     private final boolean autoClose;
     private TaskScheduler timeoutTask = null;
 
-    private EventWaiter(Builder builder)
-    {
+    private EventWaiter(Builder builder) {
         this.classType = builder.classType;
         this.condition = builder.condition;
         this.autoClose = builder.autoClose;
@@ -29,11 +28,9 @@ public class EventWaiter implements EventListener
 
         UGEBot.JDA().addEventListener(this);
 
-        if (builder.timeout > -1 && builder.unit != null)
-        {
+        if (builder.timeout > -1 && builder.unit != null) {
             timeoutTask = TaskScheduler.scheduleDelayed(() -> {
-                if (builder.timeoutAction != null)
-                {
+                if (builder.timeoutAction != null) {
                     builder.timeoutAction.run();
                 }
                 this.close();
@@ -41,10 +38,8 @@ public class EventWaiter implements EventListener
         }
     }
 
-    public void close()
-    {
-        if (timeoutTask != null)
-        {
+    public void close() {
+        if (timeoutTask != null) {
             timeoutTask.stop();
         }
         UGEBot.JDA().removeEventListener(this);
@@ -52,13 +47,10 @@ public class EventWaiter implements EventListener
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onEvent(GenericEvent event)
-    {
-        if (event.getClass().equals(classType) && (condition.test(event)))
-        {
+    public void onEvent(GenericEvent event) {
+        if (event.getClass().equals(classType) && (condition.test(event))) {
             action.accept(event, this);
-            if (this.autoClose)
-            {
+            if (this.autoClose) {
                 this.close();
             }
         }
@@ -75,34 +67,29 @@ public class EventWaiter implements EventListener
         private long timeout = -1;
         private TimeUnit unit;
 
-        public <T extends Event> Builder(Class<T> classType, Predicate<T> condition, BiConsumer<T, EventWaiter> action)
-        {
+        public <T extends Event> Builder(Class<T> classType, Predicate<T> condition, BiConsumer<T, EventWaiter> action) {
             this.classType = classType;
             this.condition = condition;
             this.action = action;
         }
 
-        public Builder autoClose(boolean autoClose)
-        {
+        public Builder autoClose(boolean autoClose) {
             this.autoClose = autoClose;
             return this;
         }
 
-        public Builder timeout(long timeout, TimeUnit unit)
-        {
+        public Builder timeout(long timeout, TimeUnit unit) {
             this.timeout = timeout;
             this.unit = unit;
             return this;
         }
 
-        public Builder timeoutAction(Runnable timeoutAction)
-        {
+        public Builder timeoutAction(Runnable timeoutAction) {
             this.timeoutAction = timeoutAction;
             return this;
         }
 
-        public EventWaiter build()
-        {
+        public EventWaiter build() {
             return new EventWaiter(this);
         }
     }
