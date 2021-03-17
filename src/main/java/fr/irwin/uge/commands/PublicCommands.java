@@ -19,52 +19,52 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import java.awt.*;
 import java.util.List;
 
-public class PublicCommands {
+public class PublicCommands
+{
 
     @Command(name = "eval", aliases = {"keval"})
     private void eval(TextChannel textChannel, String[] args) {
-
         if (args.length == 0) {
             textChannel.sendMessage(new EmbedBuilder()
                     .setTitle("(K)Eval")
-                    .setDescription("Cette commande permet d'évaluer des expressions mathématiques simples")
-                    .addField("Symboles disponibles: ", "", false)
-                    .addField("Operateurs binaires", """
+                    .setDescription("Cette commande permet d'évaluer des expressions mathématiques simples.")
+                    .addField("Opérateurs binaires", """
                             - Soustraction `-`
                             - Addition `+`
                             - Multiplication `*` (assumée)
                             - Division `/`
                             - Puissance `^`
-                            - Reste (mod) `%`
+                            - Modulo `%`
                             """, false)
                     .addField("Fonctions", """
-                        - Opposer `neg(expr)`
-                        - Maximum `max(a, b)`
-                        - Minimum `min(a, b)`
-                        - Racine carrée `sqrt(expr)`
-                        - Sinus `sin(expr)`
-                        - Cosinus `cos(expr)`
-                        - Tangente `tan(expr)`
-                        - Arcsinus `asin(expr)`
-                        - Arccosinus `acos(expr)`
-                        - Arctangente `atan(expr)`
-                        - Random `rand()` ([0; 1[)
-                        - Arrondi inférieur `floor(expr)`
-                        - Arrondi supérieur `ceil(expr)`
-                        - Logarithme base 10 `log(expr)`
-                        - Logarithme base 2 `logB(expr)`
-                        - Logarithme népérien `ln(expr)`
-                        """, false)
+                            - Opposé `neg(expr)`
+                            - Maximum `max(a, b)`
+                            - Minimum `min(a, b)`
+                            - Racine carrée `sqrt(expr)`
+                            - Sinus `sin(expr)`
+                            - Cosinus `cos(expr)`
+                            - Tangente `tan(expr)`
+                            - Arcsinus `asin(expr)`
+                            - Arccosinus `acos(expr)`
+                            - Arctangente `atan(expr)`
+                            - Random `rand()` ([0; 1[)
+                            - Arrondi inférieur `floor(expr)`
+                            - Arrondi supérieur `ceil(expr)`
+                            - Logarithme base 10 `log(expr)`
+                            - Logarithme base 2 `logB(expr)`
+                            - Logarithme népérien `ln(expr)`
+                            """, false)
                     .addField("Constantes", """
-                        - π `PI`
-                        - *e* `e` (constante de Néper)
-                        - φ `PHI`
-                        """, false)
-                    .setColor(Color.CYAN)
+                            - π `PI`
+                            - *e* `e` (constante de Néper)
+                            - φ `PHI`
+                            """, false)
+                    .setColor(new Color(0x1ABC9C))
                     .setFooter("N'hésitez pas à proposer de nouvelles fonctions (avec nom et arité)")
                     .setAuthor("notKamui")
                     .build()
             ).queue();
+            return;
         }
 
         final var content = String.join(" ", args);
