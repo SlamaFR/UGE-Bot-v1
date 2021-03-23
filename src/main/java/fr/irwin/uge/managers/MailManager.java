@@ -54,6 +54,11 @@ public final class MailManager
                 try {
                     int count = inbox.getMessageCount();
                     int delta = count - lastCount;
+
+                    if (!inbox.isOpen()) {
+                        inbox.open(Folder.READ_ONLY);
+                    }
+
                     if (delta > 0) {
                         Message[] messages = inbox.getMessages(lastCount + 1, count);
                         for (Message message : messages) {
