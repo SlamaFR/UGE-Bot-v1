@@ -104,7 +104,6 @@ public class AdminCommands
             return;
         }
 
-        StringBuilder awaitingText = new StringBuilder("Envoyez votre message ici pour terminer...");
         final String senderName = member.getEffectiveName();
         final String courseName;
 
@@ -121,7 +120,6 @@ public class AdminCommands
         } else {
             courseName = "Annonce générale";
         }
-        awaitingText.append("\n\nLe titre sera '").append(courseName).append("'.");
 
         final String avatarUrl = member.getUser().getAvatarUrl();
         final Color color = member.getColor();
@@ -132,7 +130,6 @@ public class AdminCommands
         } else {
             broadcastChannel = textChannel;
         }
-        awaitingText.append("\n\nLe message sera envoyé dans ").append(broadcastChannel.getAsMention()).append(".");
 
         Message awaitingMessage = textChannel.sendMessage(
                 new EmbedBuilder().setTitle("En attente").setDescription("Envoyez votre message ici pour terminer...")
@@ -163,17 +160,27 @@ public class AdminCommands
         if (guild == null || !RolesUtils.isAdmin(member)) {
             return;
         }
+
+        if (UGEBot.config().guilds.get(guild.getId()).disabledFeatures.contains("swearer")) {
+            MessageUtils.sendErrorMessage(textChannel, "Cette fonctionnalité est désactivée sur ce serveur !");
+            return;
+        }
+
         if (args.length == 0) {
             textChannel.sendMessage("Qui doit donc se taire ?").queue();
         } else if (!message.getMentionedMembers().isEmpty()) {
             Role role = SwearUtils.getOrCreateRole(guild);
-            for (Member m : message.getMentionedMembers()) {
-                if (m.getRoles().contains(role)) {
-                    guild.removeRoleFromMember(m.getId(), Objects.requireNonNull(role)).queue();
-                    textChannel.sendMessage("Bon aller " + m.getEffectiveName() + " du balais.").queue();
-                } else {
-                    guild.addRoleToMember(m.getId(), Objects.requireNonNull(role)).queue();
-                    textChannel.sendMessage("C'est parti " + m.getEffectiveName() + " je tiens ta veste.").queue();
+            if (role == null) {
+                MessageUtils.sendErrorMessage(textChannel, "Impossible de créer le rôle `Verbeux` !");
+            } else {
+                for (Member m : message.getMentionedMembers()) {
+                    if (m.getRoles().contains(role)) {
+                        guild.removeRoleFromMember(m.getId(), Objects.requireNonNull(role)).queue();
+                        textChannel.sendMessage("Bon aller " + m.getEffectiveName() + " du balais.").queue();
+                    } else {
+                        guild.addRoleToMember(m.getId(), Objects.requireNonNull(role)).queue();
+                        textChannel.sendMessage("C'est parti " + m.getEffectiveName() + " je tiens ta veste.").queue();
+                    }
                 }
             }
         }

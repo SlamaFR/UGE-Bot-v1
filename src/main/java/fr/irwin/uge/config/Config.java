@@ -72,7 +72,7 @@ public class Config
         @JsonProperty
         public Map<String, OrganizationDisplay> organizationDisplays = new HashMap<>();
         @JsonProperty
-        public String[] disabledCommands = new String[]{};
+        public List<String> disabledFeatures = new ArrayList<>();
 
         public static class Roles
         {

@@ -80,8 +80,7 @@ public class CommandMap
         try {
             Guild guild = message.getGuild();
             if (UGEBot.config().guilds.containsKey(guild.getId())) {
-                if (Arrays
-                        .stream(UGEBot.config().guilds.get(guild.getId()).disabledCommands)
+                if (UGEBot.config().guilds.get(guild.getId()).disabledFeatures.stream()
                         .anyMatch(s -> s.equals(cmd.getName()))) {
                     return;
                 }

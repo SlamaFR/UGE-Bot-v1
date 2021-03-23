@@ -36,9 +36,11 @@ public final class EventListener extends ListenerAdapter
         if (event.getAuthor().isBot()) {
             return;
         }
-        Member m = event.getMessage().getMember();
-        if (m != null && m.getRoles().contains(SwearUtils.getOrCreateRole(event.getGuild())) && Math.random() < .009) {
-            event.getMessage().getChannel().sendMessage(SwearUtils.getSwear()).queue();
+        if (!UGEBot.config().guilds.get(event.getGuild().getId()).disabledFeatures.contains("swearer")) {
+            Member m = event.getMessage().getMember();
+            if (m != null && m.getRoles().contains(SwearUtils.getOrCreateRole(event.getGuild())) && Math.random() < .009) {
+                event.getMessage().getChannel().sendMessage(SwearUtils.getSwear()).queue();
+            }
         }
         if (event.getMessage().getContentRaw().startsWith(CommandMap.getTag())) {
             commandMap.commandUser(event.getMessage().getContentRaw().replaceFirst("!", ""), event.getMessage());

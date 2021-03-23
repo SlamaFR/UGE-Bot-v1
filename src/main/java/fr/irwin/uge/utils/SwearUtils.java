@@ -4,6 +4,7 @@ import fr.irwin.uge.UGEBot;
 import fr.irwin.uge.redis.Redis;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.util.List;
 
@@ -20,16 +21,19 @@ public final class SwearUtils
 
     public static Role getOrCreateRole(Guild guild) {
         Role role;
-        if (Redis.instance().getBucket(guild.getId() + ":SwearerRole").get() == null) {
-            role = guild.createRole().setName("Swearer").complete();
-            Redis.instance().getBucket(guild.getId() + ":SwearerRole").set(role.getIdLong());
-        } else {
-            role = guild.getRoleById(Redis.instance().getBucket(guild.getId() + ":SwearerRole").get().toString());
-            if (role == null) {
-                role = guild.createRole().setName("Verbeux").complete();
+        try {
+            if (Redis.instance().getBucket(guild.getId() + ":SwearerRole").get() == null) {
+                role = guild.createRole().setName("Swearer").complete();
                 Redis.instance().getBucket(guild.getId() + ":SwearerRole").set(role.getIdLong());
-
+            } else {
+                role = guild.getRoleById(Redis.instance().getBucket(guild.getId() + ":SwearerRole").get().toString());
+                if (role == null) {
+                    role = guild.createRole().setName("Verbeux").complete();
+                    Redis.instance().getBucket(guild.getId() + ":SwearerRole").set(role.getIdLong());
+                }
             }
+        } catch (InsufficientPermissionException e) {
+            return null;
         }
         return role;
     }
